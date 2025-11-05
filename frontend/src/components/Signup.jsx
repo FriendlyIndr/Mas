@@ -7,20 +7,31 @@ const Signup = () => {
         <div 
           className='text-center border rounded-lg space-y-2 w-96'
         >
-          <div className='mt-2 grid grid-cols-2 gap-2'>
-            <label className='mr-2'>Email</label>
+          <div className='mt-2 p-2 space-y-2'>
+            <div className='flex justify-between'>
+              <label className='mr-2'>Email</label>
+              <input 
+                type='email'
+                className='border rounded-lg px-2 py-1'
+              />
+            </div>
 
-            <label className='mr-2'>Password</label>
-            
-            <input 
-              type='email'
-              className='border'
-            />
+            <div className='flex justify-between'>
+              <label className='mr-2'>Password</label>
+              <input 
+                type='password'
+                className='border rounded-lg px-2 py-1'
+              />
+            </div>
 
-            <input 
-              type='password'
-              className='border'
-            />
+            <div className='flex justify-between'>
+              <label className='mr-2'>Re-enter Password</label>
+              <input 
+                type='password'
+                className='border rounded-lg px-2 py-1'
+              />
+            </div>
+
           </div>
 
           <button
