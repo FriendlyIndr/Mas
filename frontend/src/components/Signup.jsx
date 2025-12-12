@@ -1,4 +1,5 @@
 import React from 'react'
+import PasswordField from './reusables/PasswordField';
 
 const Signup = () => {
   return (
@@ -18,18 +19,12 @@ const Signup = () => {
 
             <div className='flex justify-between'>
               <label className='mr-2'>Password</label>
-              <input 
-                type='password'
-                className='border rounded-lg px-2 py-1'
-              />
+              <PasswordField />
             </div>
 
             <div className='flex justify-between'>
               <label className='mr-2'>Re-enter Password</label>
-              <input 
-                type='password'
-                className='border rounded-lg px-2 py-1'
-              />
+              <PasswordField />
             </div>
 
           </div>
