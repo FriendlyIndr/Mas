@@ -1,17 +1,12 @@
 import { useState } from 'react'
 import Calendar from './components/Calendar';
-import Login from './components/Login';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import Signup from './components/Signup';
+import Auth from './components/Auth';
 
 const router = createBrowserRouter([
   {
-    path: "/login",
-    element: <Login />,
-  },
-  {
-    path: "/signup",
-    element: <Signup />,
+    path: "/auth",
+    element: <Auth />,
   },
 ]);
 
