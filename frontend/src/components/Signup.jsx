@@ -1,12 +1,14 @@
 import React from 'react'
 import PasswordField from './reusables/PasswordField';
 
-const Signup = () => {
+const Signup = ({ setShowLoginForm }) => {
   return (
     <div className='flex justify-center min-h-screen items-center'>
       <div 
         className='text-center border rounded-lg space-y-2 w-96'
       >
+        <h1 className='text-xl my-4'>Let's make an account</h1>
+
         <div className='mt-2 p-2 space-y-2'>
           <div className='flex flex-col'>
             <label className='mr-auto'>Email</label>
@@ -28,11 +30,21 @@ const Signup = () => {
 
         </div>
 
-        <button
-          className='mb-2 cursor-pointer p-2 bg-blue-600 text-white rounded-lg'
-        >
-          Sign in
-        </button>
+        <div className='p-2'>
+          <button
+            className='mb-2 cursor-pointer p-2 w-full bg-blue-600 text-white rounded-lg'
+          >
+            Sign up
+          </button>
+        </div>
+
+        <p className='mb-4'>
+          Already have an account? 
+          <span 
+            onClick={() => setShowLoginForm(true)}
+            className='ml-2 text-blue-500 cursor-pointer'>
+              Log back in!</span>
+        </p>
       </div>
     </div>
   );

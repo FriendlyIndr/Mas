@@ -7,7 +7,13 @@ const Auth = () => {
 
   return (
     <div>
-        {showLoginForm ? <Login /> : <Signup />}
+        {showLoginForm ?
+         <Login 
+          setShowLoginForm={setShowLoginForm}
+         /> : 
+         <Signup 
+          setShowLoginForm={setShowLoginForm}
+         />}
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import PasswordField from './reusables/PasswordField';
 
-const Login = () => {
+const Login = ({ setShowLoginForm }) => {
 
   return (
     <div className='flex justify-center min-h-screen items-center'>
@@ -25,11 +25,21 @@ const Login = () => {
 
         </div>
 
-        <button
-          className='mb-2 cursor-pointer p-2 bg-blue-600 text-white rounded-lg'
-        >
-          Sign in
-        </button>
+        <div className='p-2'>
+          <button
+            className='mb-2 cursor-pointer p-2 w-full bg-blue-600 text-white rounded-lg'
+          >
+            Sign in
+          </button>
+        </div>
+
+        <p className='mb-4'>
+          Don't have an account yet? 
+          <span 
+            onClick={() => setShowLoginForm(false)}
+            className='ml-2 text-blue-500 cursor-pointer'>
+              Let's make an account!</span>
+        </p>
       </div>
     </div>
   );
