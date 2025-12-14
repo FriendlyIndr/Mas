@@ -7,8 +7,9 @@ const Auth = () => {
     const [showLoginForm, setShowLoginForm] = useState(true);
 
   return (
-    <div className='flex justify-center min-h-screen items-center'>
-      <AnimatePresence mode='wait'>
+    <div className='flex justify-center min-h-screen items-center bg-linear-60 from-cyan-800 to-teal-500'>
+      <AnimatePresence mode='wait' initial={false}>
+        <motion.div layout transition={{ layout: { duration: 0.25, ease: 'easeOut' } }} className='overflow-hidden'>
           {showLoginForm ? (
             <motion.div
               key='login'
@@ -34,6 +35,7 @@ const Auth = () => {
               />
             </motion.div>
           )}
+        </motion.div>
       </AnimatePresence>
     </div>
   );

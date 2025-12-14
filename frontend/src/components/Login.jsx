@@ -4,7 +4,7 @@ const Login = ({ setShowLoginForm }) => {
 
   return (
     <div 
-      className='text-center border rounded-lg space-y-2 w-96'
+      className='text-center border rounded-lg space-y-2 w-96 bg-white'
     >
       <h1 className='text-xl my-4'>Welcome back!</h1>
 
@@ -26,7 +26,7 @@ const Login = ({ setShowLoginForm }) => {
 
       <div className='p-2'>
         <button
-          className='mb-2 cursor-pointer p-2 w-full bg-blue-600 text-white rounded-lg'
+          className='mb-2 cursor-pointer p-2 w-full bg-cyan-600 text-white rounded-lg'
         >
           Sign in
         </button>
