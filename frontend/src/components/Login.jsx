@@ -4,11 +4,11 @@ const Login = ({ setShowLoginForm }) => {
 
   return (
     <div 
-      className='text-center border rounded-lg space-y-2 w-96 bg-white'
+      className='auth-container'
     >
       <h1 className='text-xl my-4'>Welcome back!</h1>
 
-      <div className='mt-2 p-2 space-y-2'>
+      <div className='auth-form-inputs'>
         <div className='flex flex-col'>
           <label className='mr-auto'>Email</label>
           <input 

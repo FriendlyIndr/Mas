@@ -4,11 +4,11 @@ import PasswordField from './reusables/PasswordField';
 const Signup = ({ setShowLoginForm }) => {
   return (
     <div 
-      className='text-center border rounded-lg space-y-2 w-96 bg-white'
+      className='auth-container'
     >
       <h1 className='text-xl my-4'>Let's make an account</h1>
 
-      <div className='mt-2 p-2 space-y-2'>
+      <div className='auth-form-inputs'>
         <div className='flex flex-col'>
           <label className='mr-auto'>Email</label>
           <input 
