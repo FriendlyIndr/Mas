@@ -7,6 +7,7 @@ const Signup = ({ setShowLoginForm }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [message, setMessage] = useState('');
 
   // Common onChange for input fields
   function inputChange (setField, e) {
@@ -15,6 +16,12 @@ const Signup = ({ setShowLoginForm }) => {
 
   async function handleSignup () {
     try {
+      // Confirm password verification
+      if (password !== confirmPassword) {
+        setMessage('Re-entered password must be correct.');
+        return;
+      }
+
       const response = await fetch('http://localhost:3000/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -26,7 +33,11 @@ const Signup = ({ setShowLoginForm }) => {
         })
       });
 
+      const message = await response.json();
 
+      if (response.status !== 200) {
+        console.log('Error while signing up:', message);
+      }
     } catch (error) {
       console.error('Error while signing up:', error);
     }
@@ -97,4 +108,4 @@ const Signup = ({ setShowLoginForm }) => {
   );
 }
 
-export default Signup
+export default Signup;

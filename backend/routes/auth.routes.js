@@ -9,9 +9,13 @@ router.post('/signup', async (req, res) => {
         // Extract userName and password
         const { email, userName, password, confirmPassword } = req.body;
 
+        if (!email || !password || !confirmPassword) {
+            return res.status(400).json({ message: 'Missing fields' });
+        }
+
         // Confirm password verification
         if (password !== confirmPassword) {
-            res.status(401).json({
+            return res.status(400).json({
                 message: 'Confirm password does not match the password entered'
             });
         }
@@ -25,14 +29,14 @@ router.post('/signup', async (req, res) => {
             passwordHash: passwordHash,
         });
 
-        res.status(200).json({
+        return res.status(200).json({
             user: user,
             message: 'User successfully created'
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({
-            message: `Internal server error: ${error}`
+        return res.status(500).json({
+            message: 'Internal server error',
         });
     }
 });

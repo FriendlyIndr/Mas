@@ -14,7 +14,7 @@ const startServer = async () => {
     console.log('Connection has been established successfully.');
 
     app.listen(port, () => {
-      console.log(`Example app listening on port ${port}`);
+      console.log(`Backend listening on port ${port}`);
     });
   } catch (error) {
     console.error('Unable to connect to the database:', error);
