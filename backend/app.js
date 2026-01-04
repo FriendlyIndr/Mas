@@ -13,9 +13,6 @@ const startServer = async () => {
     await db.authenticate();
     console.log('Connection has been established successfully.');
 
-    // for dev only - Remove in production
-    await db.sync({ alter: false });
-
     app.listen(port, () => {
       console.log(`Example app listening on port ${port}`);
     });

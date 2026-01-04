@@ -8,7 +8,8 @@ export default db.define('User', {
     },
     email: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true,
     },
     passwordHash: {
         type: DataTypes.STRING,
