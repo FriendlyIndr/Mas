@@ -29,8 +29,12 @@ router.post('/signup', async (req, res) => {
             passwordHash: passwordHash,
         });
 
-        return res.status(200).json({
-            user: user,
+        return res.status(201).json({
+            user: {
+                id: user.id,
+                email: user.email,
+                userName: user.userName,
+            },
             message: 'User successfully created'
         });
     } catch (error) {
