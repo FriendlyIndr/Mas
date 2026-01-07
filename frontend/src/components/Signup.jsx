@@ -1,4 +1,5 @@
 import React from 'react'
+import FormField from './reusables/FormField';
 import PasswordField from './reusables/PasswordField';
 import { useState } from 'react';
 
@@ -7,6 +8,7 @@ const Signup = ({ setShowLoginForm }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [errors, setErrors] = useState({});
   const [message, setMessage] = useState('');
 
   // Common onChange for input fields
@@ -14,11 +16,49 @@ const Signup = ({ setShowLoginForm }) => {
     setField(e.target.value);
   }
 
-  async function handleSignup () {
+  async function handleSignup (e) {
     try {
+      e.preventDefault();
+
+      const newErrors = {};
+
+      const fields = [
+        {
+          key: "userName",
+          value: userName,
+          emptyMessage: 'Please enter a Username',
+        },
+        {
+          key: "email",
+          value: email,
+          emptyMessage: 'Please enter a Email',
+        },
+        {
+          key: "password",
+          value: password,
+          emptyMessage: 'Please enter a password',
+        },
+        {
+          key: "confirmPassword",
+          value: confirmPassword,
+          emptyMessage: 'Please re-enter the password',
+        },
+      ];
+
+      // Validate missing fields
+      for (const field of fields) {
+        if (!field.value) {
+          newErrors[field.key] = field.emptyMessage;
+        }
+      }
+
       // Confirm password verification
-      if (password !== confirmPassword) {
-        setMessage('Re-entered password must be correct.');
+      if (password && confirmPassword && password !== confirmPassword) {
+        newErrors.confirmPassword = 'Passwords do not match';
+      }
+
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
         return;
       }
 
@@ -35,7 +75,7 @@ const Signup = ({ setShowLoginForm }) => {
 
       const message = await response.json();
 
-      if (response.status !== 200) {
+      if (response.status !== 201) {
         console.log('Error while signing up:', message);
       }
     } catch (error) {
@@ -44,57 +84,64 @@ const Signup = ({ setShowLoginForm }) => {
   }
   
   return (
-    <div 
+    <form 
       className='auth-container'
+      onSubmit={(e) => handleSignup(e)}
     >
       <h1 className='text-xl my-4'>Let's make an account</h1>
 
       <div className='auth-form-inputs'>
-        <div className='flex flex-col'>
-          <label className='mr-auto'>Username</label>
+        <FormField
+          label={"Username"}
+          error={errors.userName}
+        >
           <input 
             type='string'
-            className='border rounded-lg px-2 py-2'
             value={userName}
             onChange={(e) => inputChange(setUserName, e)}
           />
-        </div>
+        </FormField>
 
-        <div className='flex flex-col'>
-          <label className='mr-auto'>Email</label>
+        <FormField
+          label={"Email"}
+          error={errors.email}
+        >
           <input 
             type='email'
-            className='border rounded-lg px-2 py-2'
             value={email}
             onChange={(e) => inputChange(setEmail, e)}
           />
-        </div>
+        </FormField>
 
-        <div className='flex flex-col'>
-          <label className='mr-auto'>Password</label>
+        <FormField
+          label={"Password"}
+          error={errors.password}
+        >
           <PasswordField 
             value={password}
             onChange={(e) => inputChange(setPassword, e)}
           />
-        </div>
+        </FormField>
 
-        <div className='flex flex-col'>
-          <label className='mr-auto'>Re-enter Password</label>
+        <FormField
+          label={"Re-enter Password"}
+          error={errors.confirmPassword}
+        >
           <PasswordField 
             value={confirmPassword}
             onChange={(e) => inputChange(setConfirmPassword, e)}
           />
-        </div>
+        </FormField>
 
       </div>
 
       <div className='p-2'>
-        <button
+        <input
           className='mb-2 cursor-pointer p-2 w-full bg-cyan-600 text-white rounded-lg'
           onClick={handleSignup}
-        >
-          Sign up
-        </button>
+          type='submit'
+          value={'Create Account'}
+        />
       </div>
 
       <p className='mb-4'>
@@ -104,7 +151,7 @@ const Signup = ({ setShowLoginForm }) => {
           className='ml-2 text-blue-500 cursor-pointer'>
             Log back in!</span>
       </p>
-    </div>
+    </form>
   );
 }
 

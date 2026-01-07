@@ -1,7 +1,7 @@
 import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 
-const PasswordField = ({ passwordValue, onChange }) => {
+const PasswordField = ({ value, onChange, className }) => {
   // State variable for password visibility
   const [passwordVisible, setPasswordVisible] = useState(false);
 
@@ -10,8 +10,8 @@ const PasswordField = ({ passwordValue, onChange }) => {
         <input 
             id='password'
             type={passwordVisible ? 'text' : 'password'}
-            className='border rounded-lg px-2 py-2 pr-9 w-full'
-            value={passwordValue}
+            className={`border rounded-lg px-2 py-2 pr-9 w-full ${className || ''}`}
+            value={value}
             onChange={onChange}
         />
         <span className='absolute right-1 select-none' onClick={() => setPasswordVisible(!passwordVisible)}>
