@@ -52,6 +52,22 @@ const Signup = ({ setShowLoginForm }) => {
         }
       }
 
+      // Minimum length for Username
+      if (userName && (userName.length < 8 || userName.length > 50)) {
+        newErrors.userName = 'Username must be between 8 and 50 characters long';
+      }
+      
+      // Email validation
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (email && !emailPattern.test(email)) {
+        newErrors.email = 'Invalid email format';
+      }
+
+      // Minimum password length
+      if (password && password.length < 8) {
+        newErrors.password = 'Password must be at least 8 characters long';
+      }
+
       // Confirm password verification
       if (password && confirmPassword && password !== confirmPassword) {
         newErrors.confirmPassword = 'Passwords do not match';

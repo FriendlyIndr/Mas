@@ -13,6 +13,17 @@ router.post('/signup', async (req, res) => {
             return res.status(400).json({ message: 'Missing fields' });
         }
 
+        // Email validation
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (email && !emailPattern.test(email)) {
+            return res.status(400).json({ message: 'Invalid email' });
+        }
+
+        // Minimum password length
+        if (password && password.length < 8) {
+            return res.status(400).json({ message: 'Password must be at least 8 characters long' });
+        }
+
         // Confirm password verification
         if (password !== confirmPassword) {
             return res.status(400).json({

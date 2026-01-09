@@ -9,12 +9,12 @@ const FormField = ({ label, error, children }) => {
             className: `
                 ${children.props.className || ''}
                 border rounded-lg px-2 py-2
-                ${error ? 'border-red-500' : 'border-grey-300'}
+                ${error ? 'border-red-500' : 'border-gray-300'}
             `
         })}
 
         {error && (
-            <p className='text-red-500 text-sm mr-auto'>{error}</p>
+            <p className='text-red-500 text-sm mt-1 mr-auto'>{error}</p>
         )}
     </div>
   );
