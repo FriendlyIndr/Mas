@@ -2,6 +2,8 @@ import React from 'react'
 import FormField from './reusables/FormField';
 import PasswordField from './reusables/PasswordField';
 import { useState } from 'react';
+import { signupSchema } from '../../../shared/schemas/signup.schema';
+import { z } from 'zod';
 
 const Signup = ({ setShowLoginForm }) => {
   const [userName, setUserName] = useState('');
@@ -16,65 +18,37 @@ const Signup = ({ setShowLoginForm }) => {
     setField(e.target.value);
   }
 
+  // Flatten zod errors to match frontend errors structure
+  function mapZodErrors(treeifiedErrors) {
+    const flatErrors = {};
+
+    if (treeifiedErrors?.properties) {
+      for (const [field, fieldError] of Object.entries(treeifiedErrors.properties)) {
+        if (fieldError?.errors?.length) {
+          flatErrors[field] = fieldError.errors[0]; // take first message
+        }
+      }
+    }
+
+    return flatErrors;
+  }
+
   async function handleSignup (e) {
     try {
       e.preventDefault();
 
-      const newErrors = {};
+      // Validate before sending request
+      const validationResult = signupSchema.safeParse({
+        userName,
+        email,
+        password,
+        confirmPassword,
+      });
 
-      const fields = [
-        {
-          key: "userName",
-          value: userName,
-          emptyMessage: 'Please enter a Username',
-        },
-        {
-          key: "email",
-          value: email,
-          emptyMessage: 'Please enter a Email',
-        },
-        {
-          key: "password",
-          value: password,
-          emptyMessage: 'Please enter a password',
-        },
-        {
-          key: "confirmPassword",
-          value: confirmPassword,
-          emptyMessage: 'Please re-enter the password',
-        },
-      ];
-
-      // Validate missing fields
-      for (const field of fields) {
-        if (!field.value) {
-          newErrors[field.key] = field.emptyMessage;
-        }
-      }
-
-      // Minimum length for Username
-      if (userName && (userName.length < 8 || userName.length > 50)) {
-        newErrors.userName = 'Username must be between 8 and 50 characters long';
-      }
-      
-      // Email validation
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (email && !emailPattern.test(email)) {
-        newErrors.email = 'Invalid email format';
-      }
-
-      // Minimum password length
-      if (password && password.length < 8) {
-        newErrors.password = 'Password must be at least 8 characters long';
-      }
-
-      // Confirm password verification
-      if (password && confirmPassword && password !== confirmPassword) {
-        newErrors.confirmPassword = 'Passwords do not match';
-      }
-
-      if (Object.keys(newErrors).length > 0) {
-        setErrors(newErrors);
+      if (!validationResult.success) {
+        const treeifiedErrors = z.treeifyError(validationResult.error);
+        console.log('fsb', treeifiedErrors);
+        setErrors(mapZodErrors(treeifiedErrors));
         return;
       }
 
@@ -90,6 +64,13 @@ const Signup = ({ setShowLoginForm }) => {
       });
 
       const message = await response.json();
+
+      if (response.status === 400) {
+        const mappedErrors = mapZodErrors(message.errors);
+        console.log('vsdv: ', mappedErrors);
+        setErrors(mappedErrors);
+        return;
+      }
 
       if (response.status !== 201) {
         console.log('Error while signing up:', message);

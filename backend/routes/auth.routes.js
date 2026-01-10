@@ -1,34 +1,31 @@
 import { Router } from "express";
 import User from '../models/User.js';
 import bcrypt from 'bcrypt';
+import { signupSchema } from "../../shared/schemas/signup.schema.js";
+import { z } from 'zod';
 
 const router = Router();
 
 router.post('/signup', async (req, res) => {
     try {
-        // Extract userName and password
-        const { email, userName, password, confirmPassword } = req.body;
+        // Validate request body
+        const parsed = signupSchema.safeParse(req.body);
 
-        if (!email || !password || !confirmPassword) {
-            return res.status(400).json({ message: 'Missing fields' });
-        }
+        if (!parsed.success) {
+            const errors = z.treeifyError(parsed.error);
 
-        // Email validation
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (email && !emailPattern.test(email)) {
-            return res.status(400).json({ message: 'Invalid email' });
-        }
-
-        // Minimum password length
-        if (password && password.length < 8) {
-            return res.status(400).json({ message: 'Password must be at least 8 characters long' });
-        }
-
-        // Confirm password verification
-        if (password !== confirmPassword) {
             return res.status(400).json({
-                message: 'Confirm password does not match the password entered'
-            });
+                errors
+            })
+        }
+
+        // Extract userName and password
+        const { email, userName, password } = parsed.data;
+
+        // Unique email business logic
+        const existingUser = await User.findOne({ where: { email } });
+        if (existingUser) {
+            return res.status(409).json({ message: 'Email already in use' });
         }
 
         // Hash password
@@ -49,6 +46,12 @@ router.post('/signup', async (req, res) => {
             message: 'User successfully created'
         });
     } catch (error) {
+        if (error.name === 'SequelizeUniqueConstraintError') {
+            return res.status(409).json({
+                message: 'Email already in use',
+            });
+        }
+
         console.error(error);
         return res.status(500).json({
             message: 'Internal server error',
