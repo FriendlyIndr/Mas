@@ -47,7 +47,7 @@ const Signup = ({ setShowLoginForm }) => {
 
       if (!validationResult.success) {
         const treeifiedErrors = z.treeifyError(validationResult.error);
-        console.log('fsb', treeifiedErrors);
+
         setErrors(mapZodErrors(treeifiedErrors));
         return;
       }

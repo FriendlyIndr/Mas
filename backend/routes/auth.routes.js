@@ -3,10 +3,11 @@ import User from '../models/User.js';
 import bcrypt from 'bcrypt';
 import { signupSchema } from "../../shared/schemas/signup.schema.js";
 import { z } from 'zod';
+import { signupLimiter } from "../middleware/rateLimit.js";
 
 const router = Router();
 
-router.post('/signup', async (req, res) => {
+router.post('/signup', signupLimiter, async (req, res) => {
     try {
         // Validate request body
         const parsed = signupSchema.safeParse(req.body);
