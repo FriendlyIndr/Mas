@@ -8,6 +8,10 @@ const router = createBrowserRouter([
     path: "/auth",
     element: <Auth />,
   },
+  {
+    path: "/home",
+    element: <Calendar />,
+  }
 ]);
 
 function App() {

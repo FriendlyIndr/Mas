@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import { signupSchema } from "../../shared/schemas/signup.schema.js";
 import { z } from 'zod';
 import { signupLimiter } from "../middleware/rateLimit.js";
+import jwt from 'jsonwebtoken';
 
 const router = Router();
 
@@ -36,6 +37,17 @@ router.post('/signup', signupLimiter, async (req, res) => {
             email: email,
             userName: userName,
             passwordHash: passwordHash,
+        });
+
+        // Generate token
+        const userPayload = { userId: user.id, userName: user.userName };
+        const token = jwt.sign(userPayload, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        res.cookie('auth_token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 60 * 60 * 1000, // 1 hour
         });
 
         return res.status(201).json({

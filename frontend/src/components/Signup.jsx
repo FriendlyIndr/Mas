@@ -4,6 +4,7 @@ import PasswordField from './reusables/PasswordField';
 import { useState } from 'react';
 import { signupSchema } from '../../../shared/schemas/signup.schema';
 import { z } from 'zod';
+import { useNavigate } from 'react-router-dom';
 
 const Signup = ({ setShowLoginForm }) => {
   const [userName, setUserName] = useState('');
@@ -12,6 +13,8 @@ const Signup = ({ setShowLoginForm }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState('');
+
+  const navigate = useNavigate();
 
   // Common onChange for input fields
   function inputChange (setField, e) {
@@ -63,17 +66,24 @@ const Signup = ({ setShowLoginForm }) => {
         })
       });
 
-      const message = await response.json();
+      const responseData = await response.json();
 
       if (response.status === 400) {
-        const mappedErrors = mapZodErrors(message.errors);
+        const mappedErrors = mapZodErrors(responseData.errors);
         console.log('vsdv: ', mappedErrors);
         setErrors(mappedErrors);
         return;
       }
 
       if (response.status !== 201) {
-        console.log('Error while signing up:', message);
+        setErrors({
+          email: responseData.message,
+        });
+        return;
+      }
+
+      if (response.status === 201) {
+        navigate('/home');
       }
     } catch (error) {
       console.error('Error while signing up:', error);
