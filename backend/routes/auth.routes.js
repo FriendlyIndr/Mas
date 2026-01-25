@@ -100,6 +100,17 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
+        // Generate token
+        const userPayload = { userId: user.id, userName: user.userName };
+        const token = jwt.sign(userPayload, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        res.cookie('auth_token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 60 * 60 * 1000,
+        });
+
         return res.status(200).json({ message: 'Login successful' });
     } catch (err) {
         console.error(err);
