@@ -70,7 +70,6 @@ const Signup = ({ setShowLoginForm }) => {
 
       if (response.status === 400) {
         const mappedErrors = mapZodErrors(responseData.errors);
-        console.log('vsdv: ', mappedErrors);
         setErrors(mappedErrors);
         return;
       }
@@ -145,7 +144,6 @@ const Signup = ({ setShowLoginForm }) => {
       <div className='p-2'>
         <input
           className='mb-2 cursor-pointer p-2 w-full bg-cyan-600 text-white rounded-lg'
-          onClick={handleSignup}
           type='submit'
           value={'Create Account'}
         />

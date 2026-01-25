@@ -1,35 +1,118 @@
+import { useState } from 'react';
 import PasswordField from './reusables/PasswordField';
+import { useNavigate } from 'react-router-dom';
+import { z } from 'zod';
+import { loginSchema } from '../../../shared/schemas/login.schema';
+import FormField from './reusables/FormField';
+import { tr } from 'zod/v4/locales';
 
 const Login = ({ setShowLoginForm }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState({});
+
+  const navigate = useNavigate();
+
+  // Common onChange for input fields
+  function inputChange (setField, e) {
+    setField(e.target.value);
+  }
+
+  // Flatten zod errors to match frontend errors structure
+  function mapZodErrors(treeifiedErrors) {
+    const flatErrors = {};
+
+    if (treeifiedErrors?.properties) {
+      for (const [field, fieldError] of Object.entries(treeifiedErrors.properties)) {
+        if (fieldError?.errors?.length) {
+          flatErrors[field] = fieldError.errors[0]; // take first message
+        }
+      }
+    }
+
+    return flatErrors;
+  }
+
+  async function handleLogin (e) {
+    setErrors({});
+
+    try {
+      e.preventDefault();
+
+      // Validate before sending request
+      const validationResult = loginSchema.safeParse({
+        email,
+        password,
+      });
+
+      if (!validationResult.success) {
+        const treeifiedErrors = z.treeifyError(validationResult.error);
+
+        setErrors(mapZodErrors(treeifiedErrors));
+        return;
+      }
+
+      const response = await fetch('http://localhost:3000/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type' : 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        })
+      });
+
+      const responseData = await response.json();
+
+      if (response.status === 400) {
+        const mappedErrors = mapZodErrors(responseData.errors);
+        setErrors(mappedErrors);
+        return;
+      }
+
+      if (response.status === 200) {
+        navigate('/home');
+      }
+    } catch (error) {
+      console.error('Error while logging in:', error);
+    }
+  }
 
   return (
-    <div 
+    <form 
       className='auth-container'
+      onSubmit={(e) => handleLogin(e)}
     >
       <h1 className='text-xl my-4'>Welcome back!</h1>
 
       <div className='auth-form-inputs'>
-        <div className='flex flex-col'>
-          <label className='mr-auto'>Email</label>
+        <FormField
+          label={"Email"}
+          error={errors.email}
+        >
           <input 
             type='email'
-            className='border rounded-lg px-2 py-2'
+            value={email}
+            onChange={(e) => inputChange(setEmail, e)}
           />
-        </div>
+        </FormField>
 
-        <div className='flex flex-col'>
-          <label className='mr-auto'>Password</label>
-          <PasswordField />
-        </div>
-
+        <FormField
+          label={"Password"}
+          error={errors.password}
+        >
+          <PasswordField 
+            value={password}
+            onChange={(e) => inputChange(setPassword, e)}
+          />
+        </FormField>
       </div>
 
       <div className='p-2'>
-        <button
+        <input 
           className='mb-2 cursor-pointer p-2 w-full bg-cyan-600 text-white rounded-lg'
-        >
-          Sign in
-        </button>
+          type='submit'
+          value={'Sign in'}
+        />
       </div>
 
       <p className='mb-4'>
@@ -39,7 +122,7 @@ const Login = ({ setShowLoginForm }) => {
           className='ml-2 text-blue-500 cursor-pointer'>
             Let's make an account!</span>
       </p>
-    </div>
+    </form>
   );
 }
 

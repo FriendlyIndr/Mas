@@ -5,6 +5,7 @@ import { signupSchema } from "../../shared/schemas/signup.schema.js";
 import { z } from 'zod';
 import { signupLimiter } from "../middleware/rateLimit.js";
 import jwt from 'jsonwebtoken';
+import { loginSchema } from "../../shared/schemas/login.schema.js";
 
 const router = Router();
 
@@ -21,7 +22,7 @@ router.post('/signup', signupLimiter, async (req, res) => {
             })
         }
 
-        // Extract userName and password
+        // Extract email, userName and password
         const { email, userName, password } = parsed.data;
 
         // Unique email business logic
@@ -69,6 +70,40 @@ router.post('/signup', signupLimiter, async (req, res) => {
         return res.status(500).json({
             message: 'Internal server error',
         });
+    }
+});
+
+router.post('/login', async (req, res) => {
+    try {
+        // Validate request body
+        const parsed = loginSchema.safeParse(req.body);
+
+        if (!parsed.success) {
+            const errors = z.treeifyError(parsed.error);
+
+            return res.status(400).json({
+                errors
+            });
+        }
+
+        // Extract email and password
+        const { email, password } = parsed.data;
+
+        // Find user
+        const user = await User.findOne({ where: { email } });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Check password
+        if (!(await bcrypt.compare(password, user.passwordHash))) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        return res.status(200).json({ message: 'Login successful' });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Internal Server Error' });
     }
 });
 
