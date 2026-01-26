@@ -1,4 +1,6 @@
+import { CheckCircle2 } from 'lucide-react'
 import React from 'react'
+import Task from './Task'
 
 const Day = ({ day, date }) => {
   return (
@@ -16,7 +18,7 @@ const Day = ({ day, date }) => {
 
         {/* Tasks */}
         <div className='border-t-2'>
-
+            <Task />
         </div>
     </div>
   )
