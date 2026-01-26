@@ -18,14 +18,21 @@ const Day = ({ day, date, isToday }) => {
                 name: taskName,
                 done: false,
                 id: tasksList.length,
-                date: new Date(date)
+                date: new Date(date),
+                order: tasksList.length,
             }
         ]);
         setTaskName('');
     }
 
     function checkTask(task) {
-        
+        setTasksList(tasksList.map(taskObj => {
+            if (taskObj.id === task.id) {
+                return { ...taskObj, done: !taskObj.done };
+            }
+
+            return taskObj;
+        }));
     }
 
     useEffect(() => {
@@ -34,13 +41,15 @@ const Day = ({ day, date, isToday }) => {
                 name: 'Task 1',
                 done: false,
                 id: 0,
-                date: new Date(date)
+                date: new Date(date),
+                order: 0,
             },
             {
                 name: 'Task 2',
                 done: true,
                 id: 1,
-                date: new Date(date)
+                date: new Date(date),
+                order: 1,
             },
         ]);
     }, []);
@@ -64,6 +73,7 @@ const Day = ({ day, date, isToday }) => {
                 return (
                     <Task 
                         task={task}
+                        checkTask={checkTask}
                     />
                 );
             })}

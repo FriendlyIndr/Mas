@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { CheckCircle2 } from 'lucide-react';
 
-const Task = ({ task }) => {
+const Task = ({ task, checkTask }) => {
 
   return (
     <div className='relative group pr-8 flex items-center border-b border-b-gray-200 hover:border-b-2 hover:border-b-blue-600'>
@@ -10,7 +10,10 @@ const Task = ({ task }) => {
         </div>
 
         {/* Toggle */}
-        <div className='absolute right-0 pr-[5px] pl-2 cursor-pointer'>
+        <div 
+          className='absolute right-0 pr-[5px] pl-2 cursor-pointer'
+          onClick={() => checkTask(task)}
+        >
             <CheckCircle2 size={20} className={`opacity-0 group-hover:opacity-100 transition ${task?.done ? 'text-gray-400' : ''}`}/>
         </div>
     </div>
