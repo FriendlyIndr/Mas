@@ -1,7 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { CheckCircle2 } from 'lucide-react';
 
-const Task = () => {
+const Task = ({ task }) => {
+  const [taskName, setTaskName] = useState(task?.name);
+
   return (
     <div className='relative group pr-8 flex items-center border-b border-b-gray-200 hover:border-b-2 hover:border-b-blue-600'>
         <div className='py-2.5 cursor-grab w-full'>

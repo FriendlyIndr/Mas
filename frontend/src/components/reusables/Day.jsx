@@ -1,8 +1,11 @@
 import { CheckCircle2 } from 'lucide-react'
-import React from 'react'
+import React, { useState } from 'react'
 import Task from './Task'
+import AddTask from './AddTask'
 
 const Day = ({ day, date }) => {
+    const [tasksList, setTasksList] = useState([]);
+    
   return (
     <div className='px-3'>
         {/* Header */}
@@ -19,6 +22,7 @@ const Day = ({ day, date }) => {
         {/* Tasks */}
         <div className='border-t-2'>
             <Task />
+            <AddTask />
         </div>
     </div>
   )
