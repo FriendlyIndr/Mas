@@ -4,13 +4,13 @@ import Day from './reusables/Day';
 
 const Calendar = () => {
   const [days, setDays] = useState({
-      Mon: "2026-10-03",
-      Tue: "2026-10-03",
-      Wed: "2026-10-03",
-      Thu: "2026-10-03",
-      Fri: "2026-10-03",
-      Sat: "2026-10-03",
-      Sun: "2026-10-03",
+      Mon: new Date("2026-10-03"),
+      Tue: new Date("2026-10-03"),
+      Wed: new Date("2026-10-03"),
+      Thu: new Date("2026-10-03"),
+      Fri: new Date("2026-10-03"),
+      Sat: new Date("2026-10-03"),
+      Sun: new Date("2026-10-03"),
   });
 
   const WEEK_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -34,7 +34,7 @@ const Calendar = () => {
 
     // Calculate week
     WEEK_DAYS.forEach((day, i) => {
-      const date = new Date();
+      const date = new Date(monday);
       date.setDate(date.getDate() + i);
       week[day] = date;
     });
@@ -73,11 +73,14 @@ const Calendar = () => {
               day: 'numeric',
               month: 'short'
             });
+
+            const isToday = new Date(days[day]).toDateString() === new Date().toDateString();
             
             return (
               <Day 
                 day={day}
                 date={date}
+                isToday={isToday}
                 key={i}
               />
             );
@@ -90,10 +93,13 @@ const Calendar = () => {
                 month: 'short'
               });
 
+              const isToday = new Date(days[day]).toDateString() === new Date().toDateString();
+
               return (
                 <Day 
                   day={day}
                   date={date}
+                  isToday={isToday}
                   key={i}
                 />
               );
