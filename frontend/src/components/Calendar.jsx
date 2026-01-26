@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { ChevronLeft, ChevronRight, EllipsisVertical, User } from 'lucide-react';
 import Day from './reusables/Day';
+import { DndContext, closestCenter } from '@dnd-kit/core';
+import { arrayMove } from '@dnd-kit/sortable';
 
 const Calendar = () => {
   const [days, setDays] = useState({
@@ -12,6 +14,33 @@ const Calendar = () => {
       Sat: new Date("2026-10-03"),
       Sun: new Date("2026-10-03"),
   });
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    setTasks([
+      {
+          name: 'Task 1',
+          done: false,
+          id: 0,
+          date: new Date(),
+          order: 0,
+      },
+      {
+          name: 'Task 2',
+          done: true,
+          id: 1,
+          date: new Date(),
+          order: 1,
+      },
+    ]);
+  }, []);
+
+  function handleDragEnd(e) {
+    const { active, over } = e;
+    if (!over || active.id === over.id) return;
+
+    setTasks()
+  }
 
   const WEEK_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -68,43 +97,46 @@ const Calendar = () => {
 
       <div>
         <div className='grid grid-cols-6'>
-          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((day, i) => {
-            const date = days[day].toLocaleString('en-IN', {
-              day: 'numeric',
-              month: 'short'
-            });
-
-            const isToday = new Date(days[day]).toDateString() === new Date().toDateString();
-            
-            return (
-              <Day 
-                day={day}
-                date={date}
-                isToday={isToday}
-                key={i}
-              />
-            );
-          })}
-
-          <div className='space-y-12'>
-            {['Sat', 'Sun'].map((day, i) => {
-              const date = days[day].toLocaleString('en-IN', {
-                day: 'numeric',
-                month: 'short'
-              });
+          <DndContext
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((day, i) => {
+              const date = days[day];
 
               const isToday = new Date(days[day]).toDateString() === new Date().toDateString();
-
+              
               return (
                 <Day 
                   day={day}
                   date={date}
                   isToday={isToday}
+                  tasks={tasks}
+                  setTasks={setTasks}
                   key={i}
                 />
               );
             })}
-          </div>
+
+            <div className='space-y-12'>
+              {['Sat', 'Sun'].map((day, i) => {
+                const date = days[day];
+
+                const isToday = new Date(days[day]).toDateString() === new Date().toDateString();
+
+                return (
+                  <Day 
+                    day={day}
+                    date={date}
+                    isToday={isToday}
+                    tasks={tasks}
+                    setTasks={setTasks}
+                    key={i}
+                  />
+                );
+              })}
+            </div>
+          </DndContext>
         </div>
       </div>
     </div>
