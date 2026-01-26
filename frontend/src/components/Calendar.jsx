@@ -1,34 +1,46 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ChevronLeft, ChevronRight, EllipsisVertical, User } from 'lucide-react';
 import Day from './reusables/Day';
 
 const Calendar = () => {
-  const [days, setDays] = useState([
-    {
-      day: "Mon",
-      date: "2026-10-03",
-    },
-    {
-      day: "Tue",
-      date: "2026-10-03",
-    },
-    {
-      day: "Wed",
-      date: "2026-10-03",
-    },
-    {
-      day: "Thu",
-      date: "2026-10-03",
-    },
-    {
-      day: "Fri",
-      date: "2026-10-03",
-    },
-    {
-      day: "Sat",
-      date: "2026-10-03",
-    },
-  ]);
+  const [days, setDays] = useState({
+      Mon: "2026-10-03",
+      Tue: "2026-10-03",
+      Wed: "2026-10-03",
+      Thu: "2026-10-03",
+      Fri: "2026-10-03",
+      Sat: "2026-10-03",
+      Sun: "2026-10-03",
+  });
+
+  const WEEK_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  function getMonday(date) {
+    const d = new Date(date);
+    const day = d.getDay();
+
+    const diff = day === 0 ? -6 : 1 - day;
+    d.setDate(d.getDate() + diff);
+
+    return d;
+  }
+
+  useEffect(() => {
+    // Set days
+    const today = new Date();
+    const monday = getMonday(today);
+
+    const week = {};
+
+    // Calculate week
+    WEEK_DAYS.forEach((day, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() + i);
+      week[day] = date;
+    });
+
+    setDays(week);
+  }, []);
 
   return (
     <div className='px-6 pt-6 pb-12'>
@@ -56,13 +68,37 @@ const Calendar = () => {
 
       <div>
         <div className='grid grid-cols-6'>
-          {days.map((dayObj, i) => {
+          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((day, i) => {
+            const date = days[day].toLocaleString('en-IN', {
+              day: 'numeric',
+              month: 'short'
+            });
+            
             return (
               <Day 
-                day={dayObj.day}
+                day={day}
+                date={date}
+                key={i}
               />
             );
           })}
+
+          <div className='space-y-12'>
+            {['Sat', 'Sun'].map((day, i) => {
+              const date = days[day].toLocaleString('en-IN', {
+                day: 'numeric',
+                month: 'short'
+              });
+
+              return (
+                <Day 
+                  day={day}
+                  date={date}
+                  key={i}
+                />
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
