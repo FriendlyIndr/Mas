@@ -10,6 +10,8 @@ const Login = ({ setShowLoginForm }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
   const navigate = useNavigate();
 
@@ -69,7 +71,14 @@ const Login = ({ setShowLoginForm }) => {
         return;
       }
 
+      if (response.status !== 200) {
+        const message = responseData.message;
+        setError(message);
+      }
+
       if (response.status === 200) {
+        const message = responseData.message;
+        setMessage(message);
         navigate('/home');
       }
     } catch (error) {
@@ -83,6 +92,14 @@ const Login = ({ setShowLoginForm }) => {
       onSubmit={(e) => handleLogin(e)}
     >
       <h1 className='text-xl my-4'>Welcome back!</h1>
+
+      {message && (
+        <p>{message}</p>
+      )}
+
+      {error && (
+        <p className='text-red-500 text-sm mt-1 mr-auto'>{error}</p>
+      )}
 
       <div className='auth-form-inputs'>
         <FormField
