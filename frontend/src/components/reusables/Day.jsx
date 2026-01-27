@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import Task from './Task'
 import AddTask from './AddTask'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { useDroppable } from '@dnd-kit/core';
 
 const Day = ({ day, date, isToday, tasks, setTasks }) => {
     const [taskName, setTaskName] = useState('');
@@ -12,10 +13,18 @@ const Day = ({ day, date, isToday, tasks, setTasks }) => {
         month: 'short'
     });
 
+    const { setNodeRef } = useDroppable({
+        id: date.toDateString(),
+        data: { type: 'DAY', date }
+    });
+
     const tasksForDay = useMemo(
-        () => tasks.filter(
-            t => new Date(t.date).toDateString() === date.toDateString()
-        ),
+        () => 
+            tasks
+                .filter(
+                    t => new Date(t.date).toDateString() === date.toDateString()
+                )
+                .sort((a, b) => a.order - b.order),
         [tasks, date]
     );
 
@@ -46,7 +55,7 @@ const Day = ({ day, date, isToday, tasks, setTasks }) => {
     }
     
   return (
-    <div className='px-3'>
+    <div ref={setNodeRef} className='px-3'>
         {/* Header */}
         <div className='flex justify-between pb-3'>
             <h2 className={`font-bold text-xl ${isToday ? 'text-blue-600' : ''}`}>

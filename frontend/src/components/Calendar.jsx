@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { ChevronLeft, ChevronRight, EllipsisVertical, User } from 'lucide-react';
 import Day from './reusables/Day';
-import { DndContext, closestCenter } from '@dnd-kit/core';
+import { DndContext, closestCenter, DragOverlay } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 
 const Calendar = () => {
@@ -15,6 +15,8 @@ const Calendar = () => {
       Sun: new Date("2026-10-03"),
   });
   const [tasks, setTasks] = useState([]);
+  const [activeTask, setActiveTask] = useState(null);
+  const [originDate, setOriginDate] = useState(null);
 
   useEffect(() => {
     setTasks([
@@ -37,12 +39,67 @@ const Calendar = () => {
 
   function handleDragEnd(e) {
     const { active, over } = e;
-    if (!over || active.id === over.id) return;
 
-    setTasks(tasks => {
-      const oldIndex = tasks.findIndex(t => t.id === active.id);
-      const newIndex = tasks.findIndex(t => t.id === over.id);
-      return arrayMove(tasks, oldIndex, newIndex);
+    // Dropped nowhere meaningful -> revert
+    if (!over) {
+      setTasks(prev =>
+        prev.map(t =>
+          t.id === activeTask.id
+            ? { ...t, date: originDate }
+            : t
+        )
+      );
+      return;
+    }
+
+    setTasks(prev => {
+      const activeTask = prev.find(t => t.id === active.id);
+      if (!activeTask) return prev;
+
+      const overType = over.data?.current?.type;
+
+      // Dropped on a day
+      if (overType === 'DAY') {
+        const targetDate = over.data.current.date;
+
+        const dayTasks = prev
+          .filter(t =>
+            new Date(t.date).toDateString() === targetDate.toDateString()
+          );
+
+        return prev.map(t =>
+          t.id === active.id
+            ? { ...t, date: targetDate, order: dayTasks.length }
+            : t
+        );
+      }
+
+      // Dropped on another task
+      const overTask = prev.find(t => t.id === over.id);
+      if (!overTask) return prev;
+
+      const targetDate = overTask.date;
+
+      let updated = prev.map(t =>
+        t.id === active.id ? { ...t, date: targetDate } : t
+      );
+
+      const dayTasks = updated
+        .filter(t =>
+          new Date(t.date).toDateString() ===
+          new Date(targetDate).toDateString()
+        )
+        .sort((a, b) => a.order - b.order);
+
+      const oldIndex = dayTasks.findIndex(t => t.id === active.id);
+      const newIndex = dayTasks.findIndex(t => t.id === over.id);
+
+      const reordered = arrayMove(dayTasks, oldIndex, newIndex);
+
+      return updated.map(t => {
+        const idx = reordered.findIndex(x => x.id === t.id);
+        return idx !== -1 ? { ...t, order: idx } : t;
+      });
     });
   }
 
@@ -103,7 +160,20 @@ const Calendar = () => {
         <div className='grid grid-cols-6'>
           <DndContext
             collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
+            onDragStart={({ active }) => {
+              const task = tasks.find(t => t.id === active.id)
+              setActiveTask(task);
+              setOriginDate(task?.date);
+            }}
+            onDragEnd={(e) => {
+              handleDragEnd(e);
+              setActiveTask(null);
+              setOriginDate(null);
+            }}
+            onDragCancel={() => {
+              setActiveTask(null);
+              setOriginDate(null);
+            }}
           >
             {['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((day, i) => {
               const date = days[day];
@@ -140,6 +210,14 @@ const Calendar = () => {
                 );
               })}
             </div>
+
+            <DragOverlay>
+              {activeTask ? (
+                <div className='px-3 py-2 bg-white shadow rounded border'>
+                  {activeTask.name}
+                </div>
+              ) : null}
+            </DragOverlay>
           </DndContext>
         </div>
       </div>
