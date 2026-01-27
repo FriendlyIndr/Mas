@@ -18,7 +18,7 @@ const Day = ({ day, date, isToday, tasks, setTasks }) => {
             return;
         }
 
-        setTasksList(prev => [
+        setTasks(prev => [
             ...prev,
             {
                 name: taskName,
@@ -32,7 +32,7 @@ const Day = ({ day, date, isToday, tasks, setTasks }) => {
     }
 
     function checkTask(task) {
-        setTasksList(prev => prev.map(taskObj => {
+        setTasks(prev => prev.map(taskObj => {
             if (taskObj.id === task.id) {
                 return { ...taskObj, done: !taskObj.done };
             }
@@ -49,7 +49,7 @@ const Day = ({ day, date, isToday, tasks, setTasks }) => {
             }
         }
         setTasksList(calculatedTasksList);
-    }, [tasks]);
+    }, [tasks, date]);
     
   return (
     <div className='px-3'>

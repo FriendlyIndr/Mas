@@ -39,7 +39,11 @@ const Calendar = () => {
     const { active, over } = e;
     if (!over || active.id === over.id) return;
 
-    setTasks()
+    setTasks(tasks => {
+      const oldIndex = tasks.findIndex(t => t.id === active.id);
+      const newIndex = tasks.findIndex(t => t.id === over.id);
+      return arrayMove(tasks, oldIndex, newIndex);
+    });
   }
 
   const WEEK_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
