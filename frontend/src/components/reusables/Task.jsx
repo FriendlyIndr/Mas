@@ -22,11 +22,19 @@ const Task = ({ task, checkTask }) => {
       ref={setNodeRef}
       style={style}
       {...attributes}
-      {...listeners}
       className='relative group pr-8 flex items-center border-b border-b-gray-200 hover:border-b-2 hover:border-b-blue-600'
     >
-        <div className='py-2.5 cursor-grab active:cursor-grabbing w-full'>
-            <span className={`px-1.5 ${task?.done ? 'text-gray-400 line-through' : ''}`}>{task?.name}</span>
+        <div 
+          className='py-2.5 cursor-grab active:cursor-grabbing w-full'
+          {...listeners}
+        >
+            <span 
+              className={`px-1.5 ${
+                task?.done ? 'text-gray-400 line-through' : ''
+              }`}
+            >
+              {task?.name}
+            </span>
         </div>
 
         {/* Toggle */}

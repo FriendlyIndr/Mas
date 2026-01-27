@@ -21,14 +21,14 @@ const Calendar = () => {
       {
           name: 'Task 1',
           done: false,
-          id: 0,
+          id: crypto.randomUUID(),
           date: new Date(),
           order: 0,
       },
       {
           name: 'Task 2',
           done: true,
-          id: 1,
+          id: crypto.randomUUID(),
           date: new Date(),
           order: 1,
       },

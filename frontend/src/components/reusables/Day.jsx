@@ -1,17 +1,23 @@
 import { CheckCircle2 } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import Task from './Task'
 import AddTask from './AddTask'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
 const Day = ({ day, date, isToday, tasks, setTasks }) => {
-    const [tasksList, setTasksList] = useState([]);
     const [taskName, setTaskName] = useState('');
 
     const formattedDate = date.toLocaleString('en-IN', {
         day: 'numeric',
         month: 'short'
     });
+
+    const tasksForDay = useMemo(
+        () => tasks.filter(
+            t => new Date(t.date).toDateString() === date.toDateString()
+        ),
+        [tasks, date]
+    );
 
     function addTask(taskName) {
         if (!taskName) {
@@ -23,33 +29,21 @@ const Day = ({ day, date, isToday, tasks, setTasks }) => {
             {
                 name: taskName,
                 done: false,
-                id: tasksList.length,
+                id: crypto.randomUUID(),
                 date: new Date(date),
-                order: tasksList.length,
+                order: tasksForDay.length,
             }
         ]);
         setTaskName('');
     }
 
     function checkTask(task) {
-        setTasks(prev => prev.map(taskObj => {
-            if (taskObj.id === task.id) {
-                return { ...taskObj, done: !taskObj.done };
-            }
-
-            return taskObj;
-        }));
+        setTasks(prev => 
+            prev.map(t => 
+                t.id === task.id ? { ...t, done: !t.done } : t
+            )
+        );
     }
-
-    useEffect(() => {
-        let calculatedTasksList = [];
-        for (const t of tasks) {
-            if (t.date.toDateString() === date.toDateString()) {
-                calculatedTasksList.push(t);
-            }
-        }
-        setTasksList(calculatedTasksList);
-    }, [tasks, date]);
     
   return (
     <div className='px-3'>
@@ -67,10 +61,10 @@ const Day = ({ day, date, isToday, tasks, setTasks }) => {
         {/* Tasks */}
         <div className={`border-t-2 ${isToday ? 'border-t-blue-600' : ''}`}>
             <SortableContext
-                items={tasksList.map(t => t.id)}
+                items={tasksForDay.map(t => t.id)}
                 strategy={verticalListSortingStrategy}
             >
-                {tasksList.map((task, i) => {
+                {tasksForDay.map((task, i) => {
                     return (
                         <Task 
                             task={task}
