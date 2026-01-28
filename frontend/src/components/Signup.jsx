@@ -57,6 +57,7 @@ const Signup = ({ setShowLoginForm }) => {
 
       const response = await fetch('http://localhost:3000/auth/signup', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userName: userName,

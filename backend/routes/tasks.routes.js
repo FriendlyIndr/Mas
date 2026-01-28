@@ -1,9 +1,11 @@
 import { Router } from "express";
 import Task from "../models/Task.js";
+import User from "../models/User.js";
+import { requireAuth } from "../middleware/requireAuth.js";
 
 const router = Router();
 
-router.post('/add', async (req, res) => {
+router.post('/add', requireAuth, async (req, res) => {
     try {
         // Get task
         const { name, done, date, order } = req.body;
@@ -14,6 +16,7 @@ router.post('/add', async (req, res) => {
             done,
             date,
             order,
+            userId: req.user.userId,
         });
 
         return res.status(201).json({

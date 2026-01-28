@@ -44,6 +44,7 @@ const Day = ({ day, date, isToday, tasks, setTasks }) => {
             // Post request to backend
             const response = await fetch('http://localhost:3000/tasks/add', {
                 method: 'POST',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json'
                 },
