@@ -24,7 +24,7 @@ const Task = db.define('Task', {
     },
     order: {
         type: DataTypes.INTEGER,
-        allowNull:true,
+        allowNull: true,
     },
     userId: {
         type: DataTypes.INTEGER,

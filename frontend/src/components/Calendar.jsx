@@ -19,22 +19,7 @@ const Calendar = () => {
   const [originDate, setOriginDate] = useState(null);
 
   useEffect(() => {
-    setTasks([
-      {
-          name: 'Task 1',
-          done: false,
-          id: crypto.randomUUID(),
-          date: new Date(),
-          order: 0,
-      },
-      {
-          name: 'Task 2',
-          done: true,
-          id: crypto.randomUUID(),
-          date: new Date(),
-          order: 1,
-      },
-    ]);
+    // Fetch tasks
   }, []);
 
   function handleDragEnd(e) {

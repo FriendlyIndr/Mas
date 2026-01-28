@@ -28,22 +28,45 @@ const Day = ({ day, date, isToday, tasks, setTasks }) => {
         [tasks, date]
     );
 
-    function addTask(taskName) {
+    async function addTask(taskName) {
         if (!taskName) {
             return;
         }
 
-        setTasks(prev => [
-            ...prev,
-            {
+        try {
+            const task = {
                 name: taskName,
                 done: false,
-                id: crypto.randomUUID(),
-                date: new Date(date),
+                date: date,
                 order: tasksForDay.length,
+            };
+
+            // Post request to backend
+            const response = await fetch('http://localhost:3000/tasks/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(task),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        ]);
-        setTaskName('');
+
+            const responseData = await response.json();
+
+            console.log(responseData);
+
+            setTasks(prev => [
+                ...prev,
+                responseData.createdTask
+            ]);
+        } catch (err) {
+            console.error('Error creating task:', err);
+        } finally {
+            setTaskName('');
+        }
     }
 
     function checkTask(task) {

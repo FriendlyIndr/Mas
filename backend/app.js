@@ -2,6 +2,7 @@ import 'dotenv/config';
 import db from './db.js';
 import express from 'express';
 import authRouter from './routes/auth.routes.js';
+import tasksRouter from './routes/tasks.routes.js';
 import cors from 'cors';
 
 const app = express();
@@ -33,6 +34,7 @@ app.use(cors({
 }));
 
 app.use('/auth' , authRouter);
+app.use('/tasks', tasksRouter);
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
