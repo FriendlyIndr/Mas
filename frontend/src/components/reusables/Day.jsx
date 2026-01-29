@@ -57,8 +57,6 @@ const Day = ({ day, date, isToday, tasks, setTasks }) => {
 
             const responseData = await response.json();
 
-            console.log(responseData);
-
             setTasks(prev => [
                 ...prev,
                 responseData.createdTask

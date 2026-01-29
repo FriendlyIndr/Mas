@@ -6,6 +6,7 @@ import { arrayMove } from '@dnd-kit/sortable';
 
 const Calendar = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [activeDay, setActiveDay] = useState(new Date());
   const [days, setDays] = useState({});
   const [tasks, setTasks] = useState([]);
   const [activeTask, setActiveTask] = useState(null);
@@ -133,10 +134,8 @@ const Calendar = () => {
     return d;
   }
 
-  useEffect(() => {
-    // Set days
-    const today = new Date();
-    const monday = getMonday(today);
+  function calculateWeek(date) {
+    const monday = getMonday(date);
 
     const week = {};
 
@@ -148,7 +147,11 @@ const Calendar = () => {
     });
 
     setDays(week);
-  }, []);
+  }
+
+  useEffect(() => {
+    calculateWeek(activeDay);
+  }, [activeDay]);
 
   async function fetchTasks() {
     try {
@@ -190,6 +193,14 @@ const Calendar = () => {
     fetchTasks();
   }, [days]);
 
+  function moveWeek(dir) {
+    setActiveDay(prev => {
+      const next = new Date(prev);
+      next.setDate(prev.getDate() + dir * 7);
+      return next;
+    });
+  }
+
   if (isLoading) {
     return (
       <p>Loading...</p>
@@ -199,7 +210,9 @@ const Calendar = () => {
   return (
     <div className='px-6 pt-6 pb-12'>
       <div className='flex justify-between mb-[72px]'>
-        <h1 className='text-4xl font-bold'>January 2026</h1>
+        <h1 className='text-4xl font-bold'>
+          {getMonday(activeDay).toLocaleString('en-IN', { month: 'long', year: 'numeric' })}
+        </h1>
 
         <div className='flex'>
           <div className='bg-blue-100 p-2 rounded-full cursor-pointer mr-3'>
@@ -211,11 +224,11 @@ const Calendar = () => {
           </div>
 
           <div className='bg-black text-white p-2 rounded-full cursor-pointer'>
-            <ChevronLeft className=''/>
+            <ChevronLeft onClick={() => moveWeek(-1)} className=''/>
           </div>
 
           <div className='bg-black text-white p-2 rounded-full cursor-pointer ml-3'>
-            <ChevronRight className=''/>
+            <ChevronRight onClick={() => moveWeek(1)} className=''/>
           </div>
         </div>
       </div>
