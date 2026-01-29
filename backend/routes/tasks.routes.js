@@ -2,7 +2,7 @@ import { Router } from "express";
 import Task from "../models/Task.js";
 import User from "../models/User.js";
 import { requireAuth } from "../middleware/requireAuth.js";
-import { Op } from "sequelize";
+import { Op, where } from "sequelize";
 
 const router = Router();
 
@@ -50,8 +50,6 @@ router.get('', requireAuth, async (req, res) => {
             return res.status(400).json({ message: 'startDate must be earlier than endDate' });
         }
         
-        console.log('startDate:', startDate);
-        console.log('endDate:', endDate);
         const start = new Date(startDate).toISOString().slice(0, 10);
         const end = new Date(endDate).toISOString().slice(0, 10);
 
@@ -70,6 +68,31 @@ router.get('', requireAuth, async (req, res) => {
         });
     } catch (err) {
         console.error('Error getting tasks:', err);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+router.patch('/move', requireAuth, async (req, res) => {
+    try {
+        const { tasks } = req.body;
+
+        if (!Array.isArray(tasks)) {
+            return res.status(400).json({ message: 'Invalid payload' });
+        }
+
+        // Update tasks
+        const updates = tasks.map(t =>
+            Task.update(
+                { date: t.date, order: t.order },  // Identify tasks
+                { where: { id: t.id, userId: req.user.userId } }
+            )
+        );
+
+        await Promise.all(updates);
+
+        return res.status(200).json({ success: true });
+    } catch (err) {
+        console.error(err);
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 });

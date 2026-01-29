@@ -10,6 +10,86 @@ const Calendar = () => {
   const [tasks, setTasks] = useState([]);
   const [activeTask, setActiveTask] = useState(null);
   const [originDate, setOriginDate] = useState(null);
+  const [beforeDragTasks, setBeforeDragTasks] = useState([]);
+
+  function applyDrag(prev, active, over) {
+    const activeTask = prev.find(t => t.id === active.id);
+    if (!activeTask || !over) return prev;
+
+    const overType = over.data?.current?.type;
+
+    // Dropped on a day
+    if (overType === 'DAY') {
+      const targetDate = over.data.current.date;
+
+      const dayTasks = prev
+        .filter(t =>
+          new Date(t.date).toDateString() === targetDate.toDateString()
+        );
+
+      return prev.map(t =>
+        t.id === active.id
+          ? { ...t, date: targetDate, order: dayTasks.length }
+          : t
+      );
+    }
+
+    // Dropped on another task
+    const overTask = prev.find(t => t.id === over.id);
+    if (!overTask) return prev;
+
+    const targetDate = overTask.date;
+
+    let updated = prev.map(t =>
+      t.id === active.id ? { ...t, date: targetDate } : t
+    );
+
+    const dayTasks = updated
+      .filter(t =>
+        new Date(t.date).toDateString() ===
+        new Date(targetDate).toDateString()
+      )
+      .sort((a, b) => a.order - b.order);
+
+    const oldIndex = dayTasks.findIndex(t => t.id === active.id);
+    const newIndex = dayTasks.findIndex(t => t.id === over.id);
+
+    const reordered = arrayMove(dayTasks, oldIndex, newIndex);
+
+    return updated.map(t => {
+      const idx = reordered.findIndex(x => x.id === t.id);
+      return idx !== -1 ? { ...t, order: idx } : t;
+    });
+  }
+
+  function getAfterDragChangedTasks(before, after) {
+    return after.filter(afterTask => {
+      const beforeTask = beforeDragTasks.find(b => b.id === afterTask.id);
+      if (!beforeTask) return false;
+      
+      return (
+        beforeTask.date !== afterTask.date ||
+        beforeTask.order !== afterTask.order
+      );
+    });
+  }
+
+  async function syncTasksToBackend(changedTasks) {
+    const response = await fetch('http://localhost:3000/tasks/move', {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tasks: changedTasks.map(t => ({
+          id: t.id,
+          date: t.date,
+          order: t.order,
+        })),
+      }),
+    });
+
+
+  }
 
   function handleDragEnd(e) {
     const { active, over } = e;
@@ -27,53 +107,16 @@ const Calendar = () => {
     }
 
     setTasks(prev => {
-      const activeTask = prev.find(t => t.id === active.id);
-      if (!activeTask) return prev;
+      const newTasks = applyDrag(prev, active, over);
 
-      const overType = over.data?.current?.type;
+      const changedTasks = getAfterDragChangedTasks(beforeDragTasks, newTasks);
 
-      // Dropped on a day
-      if (overType === 'DAY') {
-        const targetDate = over.data.current.date;
-
-        const dayTasks = prev
-          .filter(t =>
-            new Date(t.date).toDateString() === targetDate.toDateString()
-          );
-
-        return prev.map(t =>
-          t.id === active.id
-            ? { ...t, date: targetDate, order: dayTasks.length }
-            : t
-        );
+      if (changedTasks.length > 0) {
+        console.log('Make move task backend request');
+        syncTasksToBackend(changedTasks);
       }
 
-      // Dropped on another task
-      const overTask = prev.find(t => t.id === over.id);
-      if (!overTask) return prev;
-
-      const targetDate = overTask.date;
-
-      let updated = prev.map(t =>
-        t.id === active.id ? { ...t, date: targetDate } : t
-      );
-
-      const dayTasks = updated
-        .filter(t =>
-          new Date(t.date).toDateString() ===
-          new Date(targetDate).toDateString()
-        )
-        .sort((a, b) => a.order - b.order);
-
-      const oldIndex = dayTasks.findIndex(t => t.id === active.id);
-      const newIndex = dayTasks.findIndex(t => t.id === over.id);
-
-      const reordered = arrayMove(dayTasks, oldIndex, newIndex);
-
-      return updated.map(t => {
-        const idx = reordered.findIndex(x => x.id === t.id);
-        return idx !== -1 ? { ...t, order: idx } : t;
-      });
+      return newTasks;
     });
   }
 
@@ -180,7 +223,8 @@ const Calendar = () => {
           <DndContext
             collisionDetection={closestCenter}
             onDragStart={({ active }) => {
-              const task = tasks.find(t => t.id === active.id)
+              setBeforeDragTasks(tasks);
+              const task = tasks.find(t => t.id === active.id);
               setActiveTask(task);
               setOriginDate(task?.date);
             }}
