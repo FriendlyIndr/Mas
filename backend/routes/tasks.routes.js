@@ -2,7 +2,7 @@ import { Router } from "express";
 import Task from "../models/Task.js";
 import User from "../models/User.js";
 import { requireAuth } from "../middleware/requireAuth.js";
-import { Op, where } from "sequelize";
+import { Op, Sequelize, where } from "sequelize";
 
 const router = Router();
 
@@ -93,6 +93,24 @@ router.patch('/move', requireAuth, async (req, res) => {
         return res.status(200).json({ success: true });
     } catch (err) {
         console.error(err);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+router.put('/:taskId', requireAuth, async (req, res) => {
+    try {
+        const { taskId } = req.params;
+        console.log('taskId:', taskId);
+
+        // Update Task object
+        const updatedTask = await Task.update(
+            { done: Sequelize.literal('NOT done') },
+            { where: { id: taskId } }
+        );
+
+        return res.status(200).json({ updatedTask });
+    } catch (err) {
+        console.error('Error checking tasking:', err);
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 });

@@ -75,20 +75,22 @@ const Calendar = () => {
   }
 
   async function syncTasksToBackend(changedTasks) {
-    const response = await fetch('http://localhost:3000/tasks/move', {
-      method: 'PATCH',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        tasks: changedTasks.map(t => ({
-          id: t.id,
-          date: t.date,
-          order: t.order,
-        })),
-      }),
-    });
-
-
+    try {
+      const response = await fetch('http://localhost:3000/tasks/move', {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tasks: changedTasks.map(t => ({
+            id: t.id,
+            date: t.date,
+            order: t.order,
+          })),
+        }),
+      });
+    } catch (err) {
+      console.error('Error while syncing tasks with backend:', err);
+    }
   }
 
   function handleDragEnd(e) {
@@ -112,7 +114,6 @@ const Calendar = () => {
       const changedTasks = getAfterDragChangedTasks(beforeDragTasks, newTasks);
 
       if (changedTasks.length > 0) {
-        console.log('Make move task backend request');
         syncTasksToBackend(changedTasks);
       }
 
@@ -147,7 +148,6 @@ const Calendar = () => {
     });
 
     setDays(week);
-    setIsLoading(false);
   }, []);
 
   async function fetchTasks() {
@@ -177,6 +177,8 @@ const Calendar = () => {
       setTasks(tasks);
     } catch (err) {
       console.error('Error fetching tasks:', err);
+    } finally {
+      setIsLoading(false);
     }
   }
 

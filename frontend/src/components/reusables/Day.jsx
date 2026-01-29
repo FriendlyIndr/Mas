@@ -70,12 +70,30 @@ const Day = ({ day, date, isToday, tasks, setTasks }) => {
         }
     }
 
-    function checkTask(task) {
-        setTasks(prev => 
-            prev.map(t => 
-                t.id === task.id ? { ...t, done: !t.done } : t
-            )
-        );
+    async function checkTask(task) {
+        try {
+            // Send request to check task endpoint
+            const response = await fetch(`http://localhost:3000/tasks/${task.id}`, {
+                method: 'PUT',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    done: !task.done,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`)
+            }
+
+            setTasks(prev => 
+                prev.map(t => 
+                    t.id === task.id ? { ...t, done: !t.done } : t
+                )
+            );
+        } catch (err) {
+            console.error('Error checking task:', err);
+        }
     }
     
   return (
