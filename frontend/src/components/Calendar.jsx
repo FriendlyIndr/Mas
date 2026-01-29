@@ -5,22 +5,11 @@ import { DndContext, closestCenter, DragOverlay } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 
 const Calendar = () => {
-  const [days, setDays] = useState({
-      Mon: new Date("2026-10-03"),
-      Tue: new Date("2026-10-03"),
-      Wed: new Date("2026-10-03"),
-      Thu: new Date("2026-10-03"),
-      Fri: new Date("2026-10-03"),
-      Sat: new Date("2026-10-03"),
-      Sun: new Date("2026-10-03"),
-  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [days, setDays] = useState({});
   const [tasks, setTasks] = useState([]);
   const [activeTask, setActiveTask] = useState(null);
   const [originDate, setOriginDate] = useState(null);
-
-  useEffect(() => {
-    // Fetch tasks
-  }, []);
 
   function handleDragEnd(e) {
     const { active, over } = e;
@@ -115,7 +104,52 @@ const Calendar = () => {
     });
 
     setDays(week);
+    setIsLoading(false);
   }, []);
+
+  async function fetchTasks() {
+    try {
+      // Calculate dates
+      const dates = Object.keys(days).sort(
+        (a, b) => a - b
+      );
+
+      const startDate = dates[0];
+      const endDate = dates[dates.length - 1];
+
+      // Fetch tasks
+      const response = await fetch(`http://localhost:3000/tasks?startDate=${days[startDate]}&endDate=${days[endDate]}`, {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const { tasks } = await response.json();
+
+      setTasks(tasks);
+    } catch (err) {
+      console.error('Error fetching tasks:', err);
+    }
+  }
+
+  useEffect(() => {
+    if (Object.keys(days).length === 0) {
+      return;
+    }
+
+    fetchTasks();
+  }, [days]);
+
+  if (isLoading) {
+    return (
+      <p>Loading...</p>
+    );
+  }
 
   return (
     <div className='px-6 pt-6 pb-12'>

@@ -2,6 +2,7 @@ import { Router } from "express";
 import Task from "../models/Task.js";
 import User from "../models/User.js";
 import { requireAuth } from "../middleware/requireAuth.js";
+import { Op } from "sequelize";
 
 const router = Router();
 
@@ -27,6 +28,49 @@ router.post('/add', requireAuth, async (req, res) => {
         return res.status(500).json({
             message: 'Internal Server Error',
         });
+    }
+});
+
+router.get('', requireAuth, async (req, res) => {
+    try {
+        const { startDate, endDate } = req.query;
+
+        if (!startDate || !endDate) {
+            return res.status(400).json({ message: 'startDate and endDate are required' });
+        }
+
+        // Valid date check
+        if (isNaN(Date.parse(startDate)) || isNaN(Date.parse(endDate))) {
+            return res.status(400).json({ 
+                message: 'Invalid date format (expected YYYY-MM-DD)' 
+            });
+        }
+
+        if (new Date(startDate) > new Date(endDate)) {
+            return res.status(400).json({ message: 'startDate must be earlier than endDate' });
+        }
+        
+        console.log('startDate:', startDate);
+        console.log('endDate:', endDate);
+        const start = new Date(startDate).toISOString().slice(0, 10);
+        const end = new Date(endDate).toISOString().slice(0, 10);
+
+        // Find user tasks for the week
+        const tasks = await Task.findAll({
+            where: {
+                userId: req.user.userId,
+                date: {
+                    [Op.between]: [start, end]
+                }
+            }
+        });
+
+        return res.status(200).json({
+            tasks,
+        });
+    } catch (err) {
+        console.error('Error getting tasks:', err);
+        return res.status(500).json({ message: 'Internal Server Error' });
     }
 });
 

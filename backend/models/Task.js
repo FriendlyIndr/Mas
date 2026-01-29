@@ -30,6 +30,12 @@ const Task = db.define('Task', {
         type: DataTypes.INTEGER,
         allowNull: true,
     },
+}, {
+    indexes: [
+        {
+            fields: ['userId', 'date']
+        }
+    ]
 });
 
 Task.belongsTo(User, { foreignKey: 'userId' });
