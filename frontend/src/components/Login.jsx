@@ -109,6 +109,8 @@ const Login = ({ setShowLoginForm }) => {
         >
           <input 
             type='email'
+            inputMode='email'
+            name='email'
             value={email}
             onChange={(e) => inputChange(setEmail, e)}
           />

@@ -103,7 +103,7 @@ const Signup = ({ setShowLoginForm }) => {
           error={errors.userName}
         >
           <input 
-            type='string'
+            type='text'
             value={userName}
             onChange={(e) => inputChange(setUserName, e)}
           />
@@ -115,6 +115,8 @@ const Signup = ({ setShowLoginForm }) => {
         >
           <input 
             type='email'
+            inputMode='email'
+            name='email'
             value={email}
             onChange={(e) => inputChange(setEmail, e)}
           />
