@@ -253,8 +253,8 @@ const Calendar = () => {
             <span className='tooltip_title'>{userDetails.userName ? 'Profile' : 'Log in'}</span>
           </div>
 
-          <div className='bg-violet-300 p-2 rounded-full cursor-pointer mr-6'>
-            <EllipsisVertical className=''/>
+          <div className='dots'>
+            <EllipsisVertical />
           </div>
 
           <div className='bg-black text-white p-2 rounded-full cursor-pointer'>

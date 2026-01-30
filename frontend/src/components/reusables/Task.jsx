@@ -39,10 +39,10 @@ const Task = ({ task, checkTask }) => {
 
         {/* Toggle */}
         <div 
-          className='absolute right-0 pr-[5px] pl-2 cursor-pointer'
+          className={`toggle_container ${task?.done ? 'text-gray-400' : ''}`}
           onClick={() => checkTask(task)}
         >
-            <CheckCircle2 size={20} className={`opacity-0 group-hover:opacity-100 transition ${task?.done ? 'text-gray-400' : ''}`}/>
+            <CheckCircle2 size={20}/>
         </div>
     </div>
   )

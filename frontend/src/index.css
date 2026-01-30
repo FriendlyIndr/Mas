@@ -18,13 +18,22 @@
   }
 
   .profile {
-    @apply h-8 w-8 md:h-10 md:w-10 bg-(--lavender) p-2 rounded-full cursor-pointer mr-3 flex justify-center font-semibold;
+    @apply h-8 w-8 md:h-10 md:w-10 bg-(--lavender) text-center text-[14px] md:text-[16px] p-2 rounded-full cursor-pointer mr-3 flex justify-center font-semibold;
+  }
+
+  .dots {
+    @apply bg-(--header--menu-button-background) p-2 rounded-full cursor-pointer mr-6 text-[14px] md:text-[16px];
+  }
+
+  .toggle_container {
+    @apply absolute right-0 pr-[5px] pl-2 cursor-pointer md:opacity-0 group-hover:opacity-100 transition;
   }
 }
 
 :root {
   --lavender: #dde1fb;
   --cornflower: #5167f4;
+  --lilac: #d85dfd;
 
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
 
@@ -32,6 +41,10 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  --header--menu-button-background: #BE9CF3;
 }
 
 .tooltip_title {
