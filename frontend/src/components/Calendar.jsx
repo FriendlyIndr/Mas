@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, DoorOpen, EllipsisVertical, User } from 'luc
 import Day from './reusables/Day';
 import { DndContext, closestCenter, DragOverlay } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
+import { useNavigate } from 'react-router-dom';
 
 const Calendar = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -21,6 +22,8 @@ const Calendar = () => {
     top: 0,
     left: 0,
   });
+
+  const navigate = useNavigate();
 
   function applyDrag(prev, active, over) {
     const activeTask = prev.find(t => t.id === active.id);
@@ -238,15 +241,39 @@ const Calendar = () => {
   const profileRef = useRef(null);
 
   function handleProfileButtonClick() {
-    // Find position of profile button
-    const { offsetHeight, offsetLeft } = profileRef.current;
+    if (userDetails.userName) {
+      // Find position of profile button
+      const { offsetHeight, offsetLeft } = profileRef.current;
 
-    // Set menu visibility and positiion
-    setProfileMenu(prev => ({
-      visible: !prev.visible,
-      top: offsetHeight,
-      left: offsetLeft,
-    }));
+      // Set menu visibility and positiion
+      setProfileMenu(prev => ({
+        visible: !prev.visible,
+        top: offsetHeight,
+        left: offsetLeft,
+      }));
+    } else {
+      navigate('/auth');
+    }
+  }
+
+  async function handleLogOut() {
+    try {
+      const response = await fetch('http://localhost:3000/auth/logout', {
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: {}
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+    } catch (err) {
+      console.error('Error logging out:', err);
+    } finally {
+      setUserDetails(prev => ({
+        userName: ''
+      }));
+    }
   }
 
   if (isLoading) {
@@ -359,7 +386,7 @@ const Calendar = () => {
         </div>
       </div>
 
-      {profileMenu.visible && (
+      {profileMenu.visible && userDetails.userName && (
         <div 
           className='profile_menu'
           style={{ 
@@ -380,7 +407,7 @@ const Calendar = () => {
           <div className='profile_menu_footer'>
             <span 
               className='profile_menu_footer_link'
-              onClick={() => console.log('Log out endpoint')}
+              onClick={() => handleLogOut()}
             >
               <DoorOpen size={15} className='mr-1.5'/>
               Log out

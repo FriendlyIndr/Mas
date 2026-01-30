@@ -141,4 +141,18 @@ router.get('/me', requireAuth, async (req, res) => {
     }
 });
 
+router.post('/logout', requireAuth, async (req, res) => {
+    try {
+        // Send an empty token with an immediate expiration date
+        res.cookie('auth_token', {
+            httpOnly: true,
+            expires: new Date(Date.now())
+        });
+        return res.status(200).json({ message: 'Logout successful' });
+    } catch (err) {
+        console.log('Error logging out:', err);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
 export default router;
