@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { ChevronLeft, ChevronRight, EllipsisVertical, User } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react'
+import { ChevronLeft, ChevronRight, DoorOpen, EllipsisVertical, User } from 'lucide-react';
 import Day from './reusables/Day';
 import { DndContext, closestCenter, DragOverlay } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
@@ -15,6 +15,11 @@ const Calendar = () => {
 
   const [userDetails, setUserDetails] = useState({
     userName: ''
+  });
+  const [profileMenu, setProfileMenu] = useState({
+    visible: false,
+    top: 0,
+    left: 0,
   });
 
   function applyDrag(prev, active, over) {
@@ -230,6 +235,20 @@ const Calendar = () => {
     fetchUser();
   }, []);
 
+  const profileRef = useRef(null);
+
+  function handleProfileButtonClick() {
+    // Find position of profile button
+    const { offsetHeight, offsetLeft } = profileRef.current;
+
+    // Set menu visibility and positiion
+    setProfileMenu(prev => ({
+      visible: !prev.visible,
+      top: offsetHeight,
+      left: offsetLeft,
+    }));
+  }
+
   if (isLoading) {
     return (
       <p>Loading...</p>
@@ -237,79 +256,66 @@ const Calendar = () => {
   }
 
   return (
-    <div className='App'>
-      <div className='flex items-center justify-between px-6 py-6 md:px-0 md:pt-0 md:mb-[72px]'>
-        <h1 className='hidden md:inline text-4xl font-bold'>
-          {getMonday(activeDay).toLocaleString('en-IN', { month: 'long', year: 'numeric' })}
-        </h1>
+    <>
+      <div className='App'>
+        <div className='flex items-center justify-between px-6 py-6 md:px-0 md:pt-0 md:mb-[72px]'>
+          <h1 className='hidden md:inline text-4xl font-bold'>
+            {getMonday(activeDay).toLocaleString('en-IN', { month: 'long', year: 'numeric' })}
+          </h1>
 
-        <h1 className='md:hidden text-xl font-bold'>
-          {getMonday(activeDay).toLocaleString('en-IN', { month: 'short', year: 'numeric' })}
-        </h1>
+          <h1 className='md:hidden text-xl font-bold'>
+            {getMonday(activeDay).toLocaleString('en-IN', { month: 'short', year: 'numeric' })}
+          </h1>
 
-        <div className='flex'>
-          <div className='tooltip_container profile'>
-            {userDetails.userName ? userDetails.userName[0].toUpperCase() : <User className=''/>}
-            <span className='tooltip_title'>{userDetails.userName ? 'Profile' : 'Log in'}</span>
-          </div>
+          <div className='flex'>
+            <div 
+              ref={profileRef}
+              className='tooltip_container profile'
+              onClick={() => handleProfileButtonClick()}
+            >
+              {userDetails.userName ? userDetails.userName[0].toUpperCase() : <User className=''/>}
+              <span className='tooltip_title'>{userDetails.userName ? 'Profile' : 'Log in'}</span>
+            </div>
 
-          <div className='dots'>
-            <EllipsisVertical />
-          </div>
+            <div className='dots'>
+              <EllipsisVertical />
+            </div>
 
-          <div className='bg-black text-white p-2 rounded-full cursor-pointer'>
-            <ChevronLeft onClick={() => moveWeek(-1)} className=''/>
-          </div>
+            <div className='bg-black text-white p-2 rounded-full cursor-pointer'>
+              <ChevronLeft onClick={() => moveWeek(-1)} className=''/>
+            </div>
 
-          <div className='bg-black text-white p-2 rounded-full cursor-pointer ml-3'>
-            <ChevronRight onClick={() => moveWeek(1)} className=''/>
+            <div className='bg-black text-white p-2 rounded-full cursor-pointer ml-3'>
+              <ChevronRight onClick={() => moveWeek(1)} className=''/>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div>
-        <div className='grid grid-cols-1 md:grid-cols-6 px-6 pt-6 md:px-0 md:pt-0'>
-          <DndContext
-            collisionDetection={closestCenter}
-            onDragStart={({ active }) => {
-              setBeforeDragTasks(tasks);
-              const task = tasks.find(t => t.id === active.id);
-              setActiveTask(task);
-              setOriginDate(task?.date);
-            }}
-            onDragEnd={(e) => {
-              handleDragEnd(e);
-              setActiveTask(null);
-              setOriginDate(null);
-            }}
-            onDragCancel={() => {
-              setActiveTask(null);
-              setOriginDate(null);
-            }}
-          >
-            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((day, i) => {
-              const date = days[day];
-
-              const isToday = new Date(days[day]).toDateString() === new Date().toDateString();
-              
-              return (
-                <Day 
-                  day={day}
-                  date={date}
-                  isToday={isToday}
-                  tasks={tasks}
-                  setTasks={setTasks}
-                  key={i}
-                />
-              );
-            })}
-
-            <div className='space-y-12'>
-              {['Sat', 'Sun'].map((day, i) => {
+        <div>
+          <div className='grid grid-cols-1 md:grid-cols-6 px-6 pt-6 md:px-0 md:pt-0'>
+            <DndContext
+              collisionDetection={closestCenter}
+              onDragStart={({ active }) => {
+                setBeforeDragTasks(tasks);
+                const task = tasks.find(t => t.id === active.id);
+                setActiveTask(task);
+                setOriginDate(task?.date);
+              }}
+              onDragEnd={(e) => {
+                handleDragEnd(e);
+                setActiveTask(null);
+                setOriginDate(null);
+              }}
+              onDragCancel={() => {
+                setActiveTask(null);
+                setOriginDate(null);
+              }}
+            >
+              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((day, i) => {
                 const date = days[day];
 
                 const isToday = new Date(days[day]).toDateString() === new Date().toDateString();
-
+                
                 return (
                   <Day 
                     day={day}
@@ -321,19 +327,68 @@ const Calendar = () => {
                   />
                 );
               })}
-            </div>
 
-            <DragOverlay>
-              {activeTask ? (
-                <div className='px-3 py-2 bg-white shadow rounded border'>
-                  {activeTask.name}
-                </div>
-              ) : null}
-            </DragOverlay>
-          </DndContext>
+              <div className='space-y-12'>
+                {['Sat', 'Sun'].map((day, i) => {
+                  const date = days[day];
+
+                  const isToday = new Date(days[day]).toDateString() === new Date().toDateString();
+
+                  return (
+                    <Day 
+                      day={day}
+                      date={date}
+                      isToday={isToday}
+                      tasks={tasks}
+                      setTasks={setTasks}
+                      key={i}
+                    />
+                  );
+                })}
+              </div>
+
+              <DragOverlay>
+                {activeTask ? (
+                  <div className='px-3 py-2 bg-white shadow rounded border'>
+                    {activeTask.name}
+                  </div>
+                ) : null}
+              </DragOverlay>
+            </DndContext>
+          </div>
         </div>
       </div>
-    </div>
+
+      {profileMenu.visible && (
+        <div 
+          className='profile_menu'
+          style={{ 
+            top: profileMenu.top + 35, 
+            left: profileMenu.left - 100
+          }}
+        >
+          <div className='profile_menu_header'>
+            <div className='profile_menu_avatar'>
+              {userDetails.userName[0].toUpperCase()}
+            </div>
+
+            <div className='profile_menu_heading'>
+              {userDetails.userName}
+            </div>
+          </div>
+
+          <div className='profile_menu_footer'>
+            <span 
+              className='profile_menu_footer_link'
+              onClick={() => console.log('Log out endpoint')}
+            >
+              <DoorOpen size={15} className='mr-1.5'/>
+              Log out
+            </span>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 

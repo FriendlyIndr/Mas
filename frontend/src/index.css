@@ -28,6 +28,30 @@
   .toggle_container {
     @apply absolute right-0 pr-[5px] pl-2 cursor-pointer md:opacity-0 group-hover:opacity-100 transition;
   }
+
+  .profile_menu {
+    @apply fixed z-1000 rounded-sm border w-60 bg-white;
+  }
+
+  .profile_menu_header {
+    @apply py-6 flex flex-col items-center;
+  }
+
+  .profile_menu_avatar {
+    @apply w-[42px] h-[42px] border rounded-[21px] flex justify-center items-center;
+  }
+
+  .profile_menu_heading {
+    @apply mt-3;
+  }
+
+  .profile_menu_footer {
+    @apply border-t border-(--profile-menu-list-separator) px-4 py-3;
+  }
+
+  .profile_menu_footer_link {
+    @apply flex items-center font-normal text-[12px] cursor-pointer;
+  }
 }
 
 :root {
@@ -45,6 +69,7 @@
 
 html {
   --header--menu-button-background: #BE9CF3;
+  --profile-menu-list-separator: #0000001A;
 }
 
 .tooltip_title {
