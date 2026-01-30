@@ -98,11 +98,11 @@ const Day = ({ day, date, isToday, tasks, setTasks }) => {
     <div ref={setNodeRef} className='px-3'>
         {/* Header */}
         <div className='flex justify-between pb-3'>
-            <h2 className={`font-bold text-xl ${isToday ? 'text-blue-600' : ''}`}>
+            <h2 className={`font-bold text-xl ${isToday ? 'text-(--cornflower)' : ''}`}>
                 {formattedDate}
             </h2>
 
-            <h2 className={`font-semibold text-xl ${isToday ? 'text-blue-300' : 'text-gray-300'}`}>
+            <h2 className={`font-semibold text-xl ${isToday ? 'text-(--cornflower) opacity-40' : 'opacity-20'}`}>
                 {day}
             </h2>
         </div>

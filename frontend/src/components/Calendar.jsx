@@ -13,6 +13,10 @@ const Calendar = () => {
   const [originDate, setOriginDate] = useState(null);
   const [beforeDragTasks, setBeforeDragTasks] = useState([]);
 
+  const [userDetails, setUserDetails] = useState({
+    userName: ''
+  });
+
   function applyDrag(prev, active, over) {
     const activeTask = prev.find(t => t.id === active.id);
     if (!activeTask || !over) return prev;
@@ -201,6 +205,31 @@ const Calendar = () => {
     });
   }
 
+  async function fetchUser() {
+    try {
+      const response = await fetch('http://localhost:3000/auth/me', {
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' }
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const responseData = await response.json();
+
+      setUserDetails(prev => ({
+        userName: responseData.userName,
+      }));
+    } catch (err) {
+      console.error('Error fetching user:', err);
+    }
+  }
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
   if (isLoading) {
     return (
       <p>Loading...</p>
@@ -215,8 +244,9 @@ const Calendar = () => {
         </h1>
 
         <div className='flex'>
-          <div className='bg-blue-100 p-2 rounded-full cursor-pointer mr-3'>
-            <User className=''/>
+          <div className='tooltip_container relative h-10 w-10 bg-(--lavender) p-2 rounded-full cursor-pointer mr-3 flex justify-center font-semibold'>
+            {userDetails.userName ? userDetails.userName[0].toUpperCase() : <User className=''/>}
+            <span className='tooltip_title'>{userDetails.userName ? 'Profile' : 'Log in'}</span>
           </div>
 
           <div className='bg-violet-300 p-2 rounded-full cursor-pointer mr-6'>

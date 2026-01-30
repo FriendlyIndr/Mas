@@ -11,6 +11,9 @@
 }
 
 :root {
+  --lavender: #dde1fb;
+  --cornflower: #5167f4;
+
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
 
   font-synthesis: none;
@@ -19,3 +22,26 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.tooltip_title {
+  visibility: hidden;
+  background-color: #222c;
+  margin-top: 8px;
+  padding: 0 8px;
+  color: #fff;
+  font-size: 12px;
+  white-space: nowrap;
+  letter-spacing: normal;
+
+  position: absolute;
+  border-radius: 3px;
+  z-index: 1;
+  top: 100%;
+  /* left: 50%; */
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip_container:hover .tooltip_title {
+  visibility: visible;
+  opacity: 1;
+}

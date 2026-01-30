@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { signupLimiter } from "../middleware/rateLimit.js";
 import jwt from 'jsonwebtoken';
 import { loginSchema } from "../../shared/schemas/login.schema.js";
+import { requireAuth } from "../middleware/requireAuth.js";
 
 const router = Router();
 
@@ -115,6 +116,28 @@ router.post('/login', async (req, res) => {
     } catch (err) {
         console.error(err);
         return res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+router.get('/me', requireAuth, async (req, res) => {
+    try {
+        // Find user
+        const user = await User.findOne({
+            where: {
+                id: req.user.userId,
+            }
+        });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        return res.status(200).json({
+            userName: user.userName,
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Error fetching profile' });
     }
 });
 
