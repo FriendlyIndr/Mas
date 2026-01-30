@@ -8,6 +8,18 @@
   .auth-container {
     @apply text-center p-4 border rounded-lg space-y-2 w-96 bg-white;
   }
+
+  .App {
+    @apply md:pb-12 md:px-6 md:pt-6;
+  }
+
+  .tooltip_container {
+    @apply relative;
+  }
+
+  .profile {
+    @apply h-8 w-8 md:h-10 md:w-10 bg-(--lavender) p-2 rounded-full cursor-pointer mr-3 flex justify-center font-semibold;
+  }
 }
 
 :root {

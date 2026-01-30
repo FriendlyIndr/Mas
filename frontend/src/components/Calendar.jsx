@@ -237,14 +237,18 @@ const Calendar = () => {
   }
 
   return (
-    <div className='px-6 pt-6 pb-12'>
-      <div className='flex justify-between mb-[72px]'>
-        <h1 className='text-4xl font-bold'>
+    <div className='App'>
+      <div className='flex items-center justify-between px-6 py-6 md:px-0 md:pt-0 md:mb-[72px]'>
+        <h1 className='hidden md:inline text-4xl font-bold'>
           {getMonday(activeDay).toLocaleString('en-IN', { month: 'long', year: 'numeric' })}
         </h1>
 
+        <h1 className='md:hidden text-xl font-bold'>
+          {getMonday(activeDay).toLocaleString('en-IN', { month: 'short', year: 'numeric' })}
+        </h1>
+
         <div className='flex'>
-          <div className='tooltip_container relative h-10 w-10 bg-(--lavender) p-2 rounded-full cursor-pointer mr-3 flex justify-center font-semibold'>
+          <div className='tooltip_container profile'>
             {userDetails.userName ? userDetails.userName[0].toUpperCase() : <User className=''/>}
             <span className='tooltip_title'>{userDetails.userName ? 'Profile' : 'Log in'}</span>
           </div>
@@ -264,7 +268,7 @@ const Calendar = () => {
       </div>
 
       <div>
-        <div className='grid grid-cols-6'>
+        <div className='grid grid-cols-1 md:grid-cols-6 px-6 pt-6 md:px-0 md:pt-0'>
           <DndContext
             collisionDetection={closestCenter}
             onDragStart={({ active }) => {

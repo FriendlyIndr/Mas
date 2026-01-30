@@ -95,7 +95,7 @@ const Day = ({ day, date, isToday, tasks, setTasks }) => {
     }
     
   return (
-    <div ref={setNodeRef} className='px-3'>
+    <div ref={setNodeRef} className='md:px-3'>
         {/* Header */}
         <div className='flex justify-between pb-3'>
             <h2 className={`font-bold text-xl ${isToday ? 'text-(--cornflower)' : ''}`}>
