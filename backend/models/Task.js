@@ -29,6 +29,12 @@ const Task = db.define('Task', {
     userId: {
         type: DataTypes.INTEGER,
         allowNull: true,
+        references: {
+            model: 'Users',
+            key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
     },
 }, {
     indexes: [
