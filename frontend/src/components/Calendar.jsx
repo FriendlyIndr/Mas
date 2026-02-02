@@ -250,6 +250,7 @@ const Calendar = () => {
   }, []);
 
   const profileRef = useRef(null);
+  const profileMenuRef = useRef(null);
 
   function handleProfileButtonClick() {
     if (userDetails.userName) {
@@ -266,6 +267,22 @@ const Calendar = () => {
       navigate('/auth');
     }
   }
+
+  useEffect(() => {
+    if (!profileMenu.visible) return;
+
+    function handleClickOutsideProfileMenu(e) {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(e.target)) {
+        setProfileMenu(prev => ({ ...prev, visible: false }));
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutsideProfileMenu);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutsideProfileMenu);
+    };
+  }, [profileMenu.visible])
 
   async function handleLogOut() {
     try {
@@ -293,10 +310,6 @@ const Calendar = () => {
   }
 
   const dialogRef = useRef(null);
-
-  function closeTaskMenu() {
-    
-  }
 
   useEffect(() => {
     if (!dialogVisible) return;
@@ -459,6 +472,7 @@ const Calendar = () => {
               top: profileMenu.top + 35, 
               left: profileMenu.left - 100
             }}
+            ref={profileMenuRef}
           >
             <div className='profile_menu_header'>
               <div className='profile_menu_avatar'>
