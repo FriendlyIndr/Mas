@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { ChevronLeft, ChevronRight, DoorOpen, EllipsisVertical, User } from 'lucide-react';
+import { ChevronLeft, ChevronRight, DoorOpen, EllipsisVertical, Trash, User } from 'lucide-react';
 import Day from './reusables/Day';
-import { DndContext, closestCenter, DragOverlay } from '@dnd-kit/core';
+import { DndContext, closestCenter, DragOverlay, useSensors, useSensor, PointerSensor } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import { useNavigate } from 'react-router-dom';
 
@@ -23,7 +23,18 @@ const Calendar = () => {
     left: 0,
   });
 
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const [clickedTask, setclickedTask] = useState('');
+
   const navigate = useNavigate();
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 6, // pixels before drag starts
+      }
+    })
+  );
 
   function applyDrag(prev, active, over) {
     const activeTask = prev.find(t => t.id === active.id);
@@ -276,6 +287,38 @@ const Calendar = () => {
     }
   }
 
+  function handleTaskClick(task) {
+    setclickedTask(task);
+    setDialogVisible(true);
+  }
+
+  const dialogRef = useRef(null);
+
+  function closeTaskMenu() {
+    
+  }
+
+  useEffect(() => {
+    if (!dialogVisible) return;
+
+    function handleClickOutsideDialog(e) {
+      if (dialogRef.current && !dialogRef.current.contains(e.target)) {
+        setDialogVisible(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutsideDialog);
+
+    return () => {
+      // Cleanup the document on component unmount
+      document.removeEventListener('mousedown', handleClickOutsideDialog);
+    };
+  }, [dialogVisible]);
+
+  function deleteTask(task) {
+    console.log('Deleting')
+  }
+
   if (isLoading) {
     return (
       <p>Loading...</p>
@@ -284,83 +327,67 @@ const Calendar = () => {
 
   return (
     <>
-      <div className='App'>
-        <div className='flex items-center justify-between px-6 py-6 md:px-0 md:pt-0 md:mb-[72px]'>
-          <h1 className='hidden md:inline text-4xl font-bold'>
-            {getMonday(activeDay).toLocaleString('en-IN', { month: 'long', year: 'numeric' })}
-          </h1>
+      <>
+        <div className='App'>
+          <div className='flex items-center justify-between px-6 py-6 md:px-0 md:pt-0 md:mb-[72px]'>
+            <h1 className='hidden md:inline text-4xl font-bold'>
+              {getMonday(activeDay).toLocaleString('en-IN', { month: 'long', year: 'numeric' })}
+            </h1>
 
-          <h1 className='md:hidden text-xl font-bold'>
-            {getMonday(activeDay).toLocaleString('en-IN', { month: 'short', year: 'numeric' })}
-          </h1>
+            <h1 className='md:hidden text-xl font-bold'>
+              {getMonday(activeDay).toLocaleString('en-IN', { month: 'short', year: 'numeric' })}
+            </h1>
 
-          <div className='flex'>
-            <div 
-              ref={profileRef}
-              className='tooltip_container profile'
-              onClick={() => handleProfileButtonClick()}
-            >
-              {userDetails.userName ? userDetails.userName[0].toUpperCase() : <User className=''/>}
-              <span className='tooltip_title'>{userDetails.userName ? 'Profile' : 'Log in'}</span>
-            </div>
+            <div className='flex'>
+              <div 
+                ref={profileRef}
+                className='tooltip_container profile'
+                onClick={() => handleProfileButtonClick()}
+              >
+                {userDetails.userName ? userDetails.userName[0].toUpperCase() : <User className=''/>}
+                <span className='tooltip_title'>{userDetails.userName ? 'Profile' : 'Log in'}</span>
+              </div>
 
-            <div className='dots'>
-              <EllipsisVertical />
-            </div>
+              <div className='dots'>
+                <EllipsisVertical />
+              </div>
 
-            <div className='bg-black text-white p-2 rounded-full cursor-pointer'>
-              <ChevronLeft onClick={() => moveWeek(-1)} className=''/>
-            </div>
+              <div className='bg-black text-white p-2 rounded-full cursor-pointer'>
+                <ChevronLeft onClick={() => moveWeek(-1)} className=''/>
+              </div>
 
-            <div className='bg-black text-white p-2 rounded-full cursor-pointer ml-3'>
-              <ChevronRight onClick={() => moveWeek(1)} className=''/>
+              <div className='bg-black text-white p-2 rounded-full cursor-pointer ml-3'>
+                <ChevronRight onClick={() => moveWeek(1)} className=''/>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div>
-          <div className='grid grid-cols-1 md:grid-cols-6 px-6 pt-6 md:px-0 md:pt-0'>
-            <DndContext
-              collisionDetection={closestCenter}
-              onDragStart={({ active }) => {
-                setBeforeDragTasks(tasks);
-                const task = tasks.find(t => t.id === active.id);
-                setActiveTask(task);
-                setOriginDate(task?.date);
-              }}
-              onDragEnd={(e) => {
-                handleDragEnd(e);
-                setActiveTask(null);
-                setOriginDate(null);
-              }}
-              onDragCancel={() => {
-                setActiveTask(null);
-                setOriginDate(null);
-              }}
-            >
-              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((day, i) => {
-                const date = days[day];
-
-                const isToday = new Date(days[day]).toDateString() === new Date().toDateString();
-                
-                return (
-                  <Day 
-                    day={day}
-                    date={date}
-                    isToday={isToday}
-                    tasks={tasks}
-                    setTasks={setTasks}
-                    key={i}
-                  />
-                );
-              })}
-
-              <div className='space-y-12'>
-                {['Sat', 'Sun'].map((day, i) => {
+          <div>
+            <div className='grid grid-cols-1 md:grid-cols-6 px-6 pt-6 md:px-0 md:pt-0'>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragStart={({ active }) => {
+                  setBeforeDragTasks(tasks);
+                  const task = tasks.find(t => t.id === active.id);
+                  setActiveTask(task);
+                  setOriginDate(task?.date);
+                }}
+                onDragEnd={(e) => {
+                  handleDragEnd(e);
+                  setActiveTask(null);
+                  setOriginDate(null);
+                }}
+                onDragCancel={() => {
+                  setActiveTask(null);
+                  setOriginDate(null);
+                }}
+              >
+                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((day, i) => {
                   const date = days[day];
 
                   const isToday = new Date(days[day]).toDateString() === new Date().toDateString();
-
+                  
                   return (
                     <Day 
                       day={day}
@@ -368,50 +395,97 @@ const Calendar = () => {
                       isToday={isToday}
                       tasks={tasks}
                       setTasks={setTasks}
+                      handleTaskClick={handleTaskClick}
                       key={i}
                     />
                   );
                 })}
-              </div>
 
-              <DragOverlay>
-                {activeTask ? (
-                  <div className='px-3 py-2 bg-white shadow rounded border'>
-                    {activeTask.name}
-                  </div>
-                ) : null}
-              </DragOverlay>
-            </DndContext>
+                <div className='space-y-12'>
+                  {['Sat', 'Sun'].map((day, i) => {
+                    const date = days[day];
+
+                    const isToday = new Date(days[day]).toDateString() === new Date().toDateString();
+
+                    return (
+                      <Day 
+                        day={day}
+                        date={date}
+                        isToday={isToday}
+                        tasks={tasks}
+                        setTasks={setTasks}
+                        handleTaskClick={handleTaskClick}
+                        key={i}
+                      />
+                    );
+                  })}
+                </div>
+
+                <DragOverlay>
+                  {activeTask ? (
+                    <div className='px-3 py-2 bg-white shadow rounded border'>
+                      {activeTask.name}
+                    </div>
+                  ) : null}
+                </DragOverlay>
+              </DndContext>
+            </div>
           </div>
         </div>
-      </div>
 
-      {profileMenu.visible && userDetails.userName && (
-        <div 
-          className='profile_menu'
-          style={{ 
-            top: profileMenu.top + 35, 
-            left: profileMenu.left - 100
-          }}
-        >
-          <div className='profile_menu_header'>
-            <div className='profile_menu_avatar'>
-              {userDetails.userName[0].toUpperCase()}
+        {profileMenu.visible && userDetails.userName && (
+          <div 
+            className='profile_menu'
+            style={{ 
+              top: profileMenu.top + 35, 
+              left: profileMenu.left - 100
+            }}
+          >
+            <div className='profile_menu_header'>
+              <div className='profile_menu_avatar'>
+                {userDetails.userName[0].toUpperCase()}
+              </div>
+
+              <div className='profile_menu_heading'>
+                {userDetails.userName}
+              </div>
             </div>
 
-            <div className='profile_menu_heading'>
-              {userDetails.userName}
+            <div className='profile_menu_footer'>
+              <span 
+                className='profile_menu_footer_link'
+                onClick={() => handleLogOut()}
+              >
+                <DoorOpen size={15} className='mr-1.5'/>
+                Log out
+              </span>
             </div>
           </div>
+        )}
+      </>
 
-          <div className='profile_menu_footer'>
-            <span 
-              className='profile_menu_footer_link'
-              onClick={() => handleLogOut()}
+      {dialogVisible && (
+        <div 
+          className='dialog_overlay' 
+          style={{ inset: 0 }}
+        >
+          <div 
+            className='task_menu dialog withPaddings sizeMedium'
+            ref={dialogRef}
+          >
+            <div 
+              className='tooltip_container'
+              onClick={() => deleteTask(clickedTask)}
             >
-              <DoorOpen size={15} className='mr-1.5'/>
-              Log out
-            </span>
+              <span className='tooltip_title'>Delete</span>
+              <Trash />
+            </div>
+
+            <div className='dialog_task_name'>
+              <textarea 
+                value={clickedTask.name}
+              ></textarea>
+            </div>
           </div>
         </div>
       )}

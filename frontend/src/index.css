@@ -14,7 +14,7 @@
   }
 
   .tooltip_container {
-    @apply relative;
+    @apply relative cursor-pointer;
   }
 
   .profile {
@@ -51,6 +51,26 @@
 
   .profile_menu_footer_link {
     @apply flex items-center font-normal text-[12px] cursor-pointer;
+  }
+
+  .dialog {
+    @apply rounded-3xl max-w-lg mx-auto my-16;
+  }
+
+  .dialog.withPaddings {
+    @apply p-6;
+  }
+
+  .dialog.sizeMedium {
+    @apply max-w-lg;
+  }
+
+  .dialog_overlay {
+    @apply fixed z-1000 px-3 bg-[#0006] transition-opacity transform duration-350;
+  }
+
+  .task_menu {
+    @apply transition-opacity transform duration-350 bg-[rgb(221,225,251)];
   }
 }
 

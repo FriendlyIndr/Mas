@@ -3,7 +3,7 @@ import { CheckCircle2 } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
-const Task = ({ task, checkTask }) => {
+const Task = ({ task, checkTask, handleTaskClick }) => {
   const {
     attributes,
     listeners,
@@ -27,6 +27,7 @@ const Task = ({ task, checkTask }) => {
         <div 
           className='py-2.5 cursor-grab active:cursor-grabbing w-full'
           {...listeners}
+          onClick={() => handleTaskClick(task)}
         >
             <span 
               className={`px-1.5 ${

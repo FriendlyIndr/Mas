@@ -5,7 +5,7 @@ import AddTask from './AddTask'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useDroppable } from '@dnd-kit/core';
 
-const Day = ({ day, date, isToday, tasks, setTasks }) => {
+const Day = ({ day, date, isToday, tasks, setTasks, handleTaskClick }) => {
     const [taskName, setTaskName] = useState('');
 
     const formattedDate = date.toLocaleString('en-IN', {
@@ -118,6 +118,7 @@ const Day = ({ day, date, isToday, tasks, setTasks }) => {
                         <Task 
                             task={task}
                             checkTask={checkTask}
+                            handleTaskClick={handleTaskClick}
                             key={task.id}
                         />
                     );
