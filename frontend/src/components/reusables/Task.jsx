@@ -30,7 +30,7 @@ const Task = ({ task, checkTask, handleTaskClick }) => {
           onClick={() => handleTaskClick(task)}
         >
             <span 
-              className={`px-1.5 ${
+              className={`px-1.5 block max-w-full truncate ${
                 task?.done ? 'text-gray-400 line-through' : ''
               }`}
             >

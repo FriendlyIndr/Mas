@@ -371,12 +371,12 @@ const Calendar = () => {
                 <EllipsisVertical />
               </div>
 
-              <div className='bg-black text-white p-2 rounded-full cursor-pointer'>
-                <ChevronLeft onClick={() => moveWeek(-1)} className=''/>
+              <div className='bg-black text-white p-2 rounded-full cursor-pointer' onClick={() => moveWeek(-1)}>
+                <ChevronLeft className=''/>
               </div>
 
-              <div className='bg-black text-white p-2 rounded-full cursor-pointer ml-3'>
-                <ChevronRight onClick={() => moveWeek(1)} className=''/>
+              <div className='bg-black text-white p-2 rounded-full cursor-pointer ml-3' onClick={() => moveWeek(1)}>
+                <ChevronRight className=''/>
               </div>
             </div>
           </div>
