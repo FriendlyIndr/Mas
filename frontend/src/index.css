@@ -18,11 +18,19 @@
   }
 
   .profile {
-    @apply h-8 w-8 md:h-10 md:w-10 bg-(--lavender) text-center text-[14px] md:text-[16px] p-2 rounded-full cursor-pointer mr-3 flex justify-center font-semibold;
+    @apply flex items-center justify-center h-8 w-8 md:h-10 md:w-10 bg-(--lavender) text-[14px] md:text-[16px] p-2 rounded-full cursor-pointer mr-3 font-semibold;
   }
 
   .dots {
-    @apply bg-(--header--menu-button-background) p-2 rounded-full cursor-pointer mr-6 text-[14px] md:text-[16px];
+    @apply flex items-center justify-center h-8 w-8 md:h-10 md:w-10 bg-(--header--menu-button-background) p-2 rounded-full cursor-pointer mr-6 text-[14px] md:text-[16px];
+  }
+
+  .arrow_left {
+    @apply flex items-center justify-center h-8 w-8 md:h-10 md:w-10;
+  }
+
+  .arrow_right {
+    @apply flex items-center justify-center h-8 w-8 md:h-10 md:w-10;
   }
 
   .toggle_container {
@@ -114,4 +122,12 @@ html {
 .tooltip_container:hover .tooltip_title {
   visibility: visible;
   opacity: 1;
+}
+
+/* Responsiveness */
+
+@media screen and (max-width: 1023px) {
+  .weekly_tasks_view>div+div {
+    margin-top: 24px;
+  }
 }

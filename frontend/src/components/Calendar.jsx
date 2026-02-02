@@ -348,7 +348,7 @@ const Calendar = () => {
     <>
       <>
         <div className='App'>
-          <div className='flex items-center justify-between px-6 py-6 md:px-0 md:pt-0 md:mb-[72px]'>
+          <div className='flex items-center justify-between px-6 py-4 md:py-0 md:px-0 md:pt-0 md:mb-[72px]'>
             <h1 className='hidden md:inline text-4xl font-bold'>
               {getMonday(activeDay).toLocaleString('en-IN', { month: 'long', year: 'numeric' })}
             </h1>
@@ -368,21 +368,21 @@ const Calendar = () => {
               </div>
 
               <div className='dots'>
-                <EllipsisVertical />
+                <EllipsisVertical className=''/>
               </div>
 
-              <div className='bg-black text-white p-2 rounded-full cursor-pointer' onClick={() => moveWeek(-1)}>
+              <div className='arrow_left bg-black text-white p-2 rounded-full cursor-pointer' onClick={() => moveWeek(-1)}>
                 <ChevronLeft className=''/>
               </div>
 
-              <div className='bg-black text-white p-2 rounded-full cursor-pointer ml-3' onClick={() => moveWeek(1)}>
+              <div className='arrow_right bg-black text-white p-2 rounded-full cursor-pointer ml-3' onClick={() => moveWeek(1)}>
                 <ChevronRight className=''/>
               </div>
             </div>
           </div>
 
           <div>
-            <div className='grid grid-cols-1 md:grid-cols-6 px-6 pt-6 md:px-0 md:pt-0'>
+            <div className='weekly_tasks_view grid grid-cols-1 md:grid-cols-6 px-6 pt-6 md:px-0 md:pt-0'>
               <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
@@ -420,7 +420,7 @@ const Calendar = () => {
                   );
                 })}
 
-                <div className='space-y-12'>
+                <div className='md:space-y-12 weekly_tasks_view'>
                   {['Sat', 'Sun'].map((day, i) => {
                     const date = days[day];
 
