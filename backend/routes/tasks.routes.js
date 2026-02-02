@@ -115,4 +115,26 @@ router.put('/:taskId', requireAuth, async (req, res) => {
     }
 });
 
+router.delete('/:taskId', requireAuth, async (req, res) => {
+    try {
+        // Find task
+        const { taskId } = req.params;
+
+        const deletedTaskCount = await Task.destroy({
+            where: {
+                id: taskId,
+            },
+        });
+
+        if (deletedTaskCount === 0) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+
+        return res.status(200).json({ message: 'Task deleted successfully' });
+    } catch (err) {
+        console.error('Error deleting task:', err);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
 export default router;

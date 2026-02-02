@@ -315,8 +315,27 @@ const Calendar = () => {
     };
   }, [dialogVisible]);
 
-  function deleteTask(task) {
-    console.log('Deleting')
+  async function deleteTask(task) {
+    try {
+      const response = await fetch(`http://localhost:3000/tasks/${task.id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      setDialogVisible(false);
+      setTasks(prev => (
+        prev.filter(function(t) {
+          return t.id !== task.id;
+        })
+      ));
+    } catch (err) {
+      console.error('Error deleting task:', err);
+    }
   }
 
   if (isLoading) {
