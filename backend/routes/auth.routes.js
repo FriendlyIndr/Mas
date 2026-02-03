@@ -1,5 +1,6 @@
 import { Router } from "express";
 import User from '../models/User.js';
+import RefreshToken from '../models/RefreshToken.js';
 import bcrypt from 'bcrypt';
 import { signupSchema } from "../../shared/schemas/signup.schema.js";
 import { z } from 'zod';
@@ -7,8 +8,18 @@ import { signupLimiter } from "../middleware/rateLimit.js";
 import jwt from 'jsonwebtoken';
 import { loginSchema } from "../../shared/schemas/login.schema.js";
 import { requireAuth } from "../middleware/requireAuth.js";
+import * as crypto from 'crypto';
 
 const router = Router();
+
+const REFRESH_TOKEN_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+
+function hashToken(token) {
+    return crypto
+        .createHash('sha256')
+        .update(token)
+        .digest('hex');
+}
 
 router.post('/signup', signupLimiter, async (req, res) => {
     try {
@@ -41,15 +52,33 @@ router.post('/signup', signupLimiter, async (req, res) => {
             passwordHash: passwordHash,
         });
 
-        // Generate token
+        // Generate tokens
         const userPayload = { userId: user.id, userName: user.userName };
-        const token = jwt.sign(userPayload, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const accessToken = jwt.sign(userPayload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        res.cookie('auth_token', token, {
+        const refreshToken = crypto.randomBytes(64).toString('hex');
+
+        // Store refresh token hash in DB
+        const refreshTokenHash = hashToken(refreshToken);
+
+        await RefreshToken.create({
+            userId: user.id,
+            tokenHash: refreshTokenHash,
+            expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL),
+        });
+
+        res.cookie('auth_token', accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            sameSite: 'lax',
             maxAge: 60 * 60 * 1000, // 1 hour
+        });
+
+        res.cookie('refresh_token', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/auth/refresh',
         });
 
         return res.status(201).json({
@@ -103,18 +132,113 @@ router.post('/login', async (req, res) => {
 
         // Generate token
         const userPayload = { userId: user.id, userName: user.userName };
-        const token = jwt.sign(userPayload, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const accessToken = jwt.sign(userPayload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        res.cookie('auth_token', token, {
+        const refreshToken = crypto.randomBytes(64).toString('hex');
+
+        // Store refresh token hash in DB
+        const refreshTokenHash = hashToken(refreshToken);
+
+        await RefreshToken.create({
+            userId: user.id,
+            tokenHash: refreshTokenHash,
+            expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL),
+        });
+
+        res.cookie('auth_token', accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            sameSite: 'lax',
             maxAge: 60 * 60 * 1000,
+        });
+
+        res.cookie('refresh_token', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/auth/refresh',
         });
 
         return res.status(200).json({ message: 'Login successful' });
     } catch (err) {
         console.error(err);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+router.post('/refresh', async (req, res) => {
+    try {
+        const refreshToken = req.cookies.refresh_token;
+
+        if (!refreshToken) {
+            return res.status(401).json({ message: 'Missing refresh token' });
+        }
+
+        // Hash refresh token
+        const refreshTokenHash = hashToken(refreshToken);
+
+        const refreshTokenRecord = await RefreshToken.findOne({
+            where: {
+                tokenHash: refreshTokenHash,
+            }
+        });
+
+        if (!refreshTokenRecord) {
+            return res.status(401).json({ message: 'Invalid refresh token' });
+        }
+
+        if (refreshTokenRecord.expiresAt < new Date()) {
+            return res.status(401).json({ message: 'Refresh token expired.' });
+        }
+
+        // Detect Reuse Attack
+        if (refreshTokenRecord.revokedAt) {
+            // Revoke all user sessions
+            await RefreshToken.update(
+                { revokedAt: new Date() },
+                { where: { userId: refreshTokenRecord.userId } }
+            );
+
+            return res.status(401).json({ message: 'Refresh token reuse detected' });
+        }
+
+        const user = await User.findByPk(refreshTokenRecord.userId);
+
+        // Generate access token
+        const userPayload = { userId: user.id, userName: user.userName };
+        const accessToken = jwt.sign(userPayload, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        res.cookie('auth_token', accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 60 * 60 * 1000,
+        });
+
+        // Revoke old refresh token
+        refreshTokenRecord.revokedAt = new Date();
+        await refreshTokenRecord.save();
+
+        // Issue new refresh token
+        const newRefreshToken = crypto.randomBytes(64).toString('hex');
+        const newHash = hashToken(newRefreshToken);
+
+        await RefreshToken.create({
+            userId: user.id,
+            tokenHash: newHash,
+            expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL),
+        });
+
+        res.cookie('refresh_token', newRefreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/auth/refresh',
+        });
+
+        return res.status(200).json({ message: 'Refresh token successsfully issued' });
+    } catch (err) {
+        console.error('Error while creating refresh token:', err);
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 });
@@ -143,12 +267,16 @@ router.get('/me', requireAuth, async (req, res) => {
 
 router.post('/logout', requireAuth, async (req, res) => {
     try {
-        // Send an empty token with an immediate expiration date
-        res.cookie('auth_token', {
-            httpOnly: true,
-            expires: new Date(Date.now())
-        });
-        return res.status(200).json({ message: 'Logout successful' });
+        // Revoke refresh token
+        res.clearCookie('auth_token');
+        res.clearCookie('refresh_token', { path: '/auth/refresh' });
+
+        await RefreshToken.update(
+            { revokedAt: new Date() },
+            { where: { userId: req.user.id } }
+        );
+
+        return res.status(204);
     } catch (err) {
         console.log('Error logging out:', err);
         return res.status(500).json({ message: 'Internal Server Error' });

@@ -4,6 +4,8 @@ import Day from './reusables/Day';
 import { DndContext, closestCenter, DragOverlay, useSensors, useSensor, PointerSensor } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import { useNavigate } from 'react-router-dom';
+import apiFetch from '../utils/apiFetch';
+import { useAuth } from '../auth/AuthContext';
 
 const Calendar = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -27,6 +29,7 @@ const Calendar = () => {
   const [clickedTask, setclickedTask] = useState('');
 
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -187,8 +190,7 @@ const Calendar = () => {
       const endDate = dates[dates.length - 1];
 
       // Fetch tasks
-      const response = await fetch(`http://localhost:3000/tasks?startDate=${days[startDate]}&endDate=${days[endDate]}`, {
-        credentials: 'include',
+      const response = await apiFetch(`http://localhost:3000/tasks?startDate=${days[startDate]}&endDate=${days[endDate]}`, {
         headers: {
           'Content-Type': 'application/json'
         },
@@ -226,10 +228,10 @@ const Calendar = () => {
 
   async function fetchUser() {
     try {
-      const response = await fetch('http://localhost:3000/auth/me', {
+      const response = await apiFetch('http://localhost:3000/auth/me', {
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' }
-      })
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -283,26 +285,6 @@ const Calendar = () => {
       document.removeEventListener('mousedown', handleClickOutsideProfileMenu);
     };
   }, [profileMenu.visible])
-
-  async function handleLogOut() {
-    try {
-      const response = await fetch('http://localhost:3000/auth/logout', {
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: {}
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-    } catch (err) {
-      console.error('Error logging out:', err);
-    } finally {
-      setUserDetails(prev => ({
-        userName: ''
-      }));
-    }
-  }
 
   function handleTaskClick(task) {
     setclickedTask(task);
@@ -487,7 +469,7 @@ const Calendar = () => {
             <div className='profile_menu_footer'>
               <span 
                 className='profile_menu_footer_link'
-                onClick={() => handleLogOut()}
+                onClick={logout}
               >
                 <DoorOpen size={15} className='mr-1.5'/>
                 Log out
