@@ -187,10 +187,6 @@ router.post('/refresh', async (req, res) => {
             return res.status(401).json({ message: 'Invalid refresh token' });
         }
 
-        if (refreshTokenRecord.expiresAt < new Date()) {
-            return res.status(401).json({ message: 'Refresh token expired.' });
-        }
-
         // Detect Reuse Attack
         if (refreshTokenRecord.revokedAt) {
             // Revoke all user sessions
@@ -202,18 +198,11 @@ router.post('/refresh', async (req, res) => {
             return res.status(401).json({ message: 'Refresh token reuse detected' });
         }
 
+        if (refreshTokenRecord.expiresAt < new Date()) {
+            return res.status(401).json({ message: 'Refresh token expired.' });
+        }
+
         const user = await User.findByPk(refreshTokenRecord.userId);
-
-        // Generate access token
-        const userPayload = { userId: user.id, userName: user.userName };
-        const accessToken = jwt.sign(userPayload, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-        res.cookie('auth_token', accessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 60 * 60 * 1000,
-        });
 
         // Revoke old refresh token
         refreshTokenRecord.revokedAt = new Date();
@@ -227,6 +216,17 @@ router.post('/refresh', async (req, res) => {
             userId: user.id,
             tokenHash: newHash,
             expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL),
+        });
+
+        // Generate access token
+        const userPayload = { userId: user.id, userName: user.userName };
+        const accessToken = jwt.sign(userPayload, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        res.cookie('auth_token', accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 60 * 60 * 1000,
         });
 
         res.cookie('refresh_token', newRefreshToken, {
@@ -273,7 +273,7 @@ router.post('/logout', requireAuth, async (req, res) => {
 
         await RefreshToken.update(
             { revokedAt: new Date() },
-            { where: { userId: req.user.id } }
+            { where: { userId: req.user.userId } }
         );
 
         return res.status(204);

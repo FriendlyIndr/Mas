@@ -4,7 +4,7 @@ import { SessionExpireError } from "../utils/errors";
 import { useAuth } from "./AuthContext";
 
 export function useAuthGuard() {
-    const { logout } = useAuth();
+    const { logout, login, resolveAuth } = useAuth();
 
     return async (fn) => {
         try {

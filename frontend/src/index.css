@@ -80,6 +80,10 @@
   .task_menu {
     @apply transition-opacity transform duration-350 bg-[rgb(221,225,251)];
   }
+
+  .top_options_container {
+    @apply flex justify-between;
+  }
 }
 
 :root {

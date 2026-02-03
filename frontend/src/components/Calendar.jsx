@@ -6,6 +6,7 @@ import { arrayMove } from '@dnd-kit/sortable';
 import { useNavigate } from 'react-router-dom';
 import apiFetch from '../utils/apiFetch';
 import { useAuth } from '../auth/AuthContext';
+import { useAuthGuard } from '../auth/useAuthGuard';
 
 const Calendar = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -30,6 +31,8 @@ const Calendar = () => {
 
   const navigate = useNavigate();
   const { logout } = useAuth();
+
+  const guard = useAuthGuard();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -215,7 +218,7 @@ const Calendar = () => {
       return;
     }
 
-    fetchTasks();
+    guard(fetchTasks);
   }, [days]);
 
   function moveWeek(dir) {
@@ -248,7 +251,7 @@ const Calendar = () => {
   }
 
   useEffect(() => {
-    fetchUser();
+    guard(fetchUser);
   }, []);
 
   const profileRef = useRef(null);
@@ -488,12 +491,18 @@ const Calendar = () => {
             className='task_menu dialog withPaddings sizeMedium'
             ref={dialogRef}
           >
-            <div 
-              className='tooltip_container'
-              onClick={() => deleteTask(clickedTask)}
-            >
-              <span className='tooltip_title'>Delete</span>
-              <Trash />
+            <div className='top_options_container'>
+              <div className='date_picker'>
+
+              </div>
+              
+              <div 
+                className='tooltip_container'
+                onClick={() => deleteTask(clickedTask)}
+              >
+                <span className='tooltip_title'>Delete</span>
+                <Trash />
+              </div>
             </div>
 
             <div className='dialog_task_name'>
