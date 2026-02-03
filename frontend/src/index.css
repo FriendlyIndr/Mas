@@ -14,7 +14,11 @@
   }
 
   .tooltip_container {
-    @apply relative cursor-pointer;
+    @apply relative cursor-pointer w-8 h-9 flex items-center justify-center;
+  }
+
+  .tooltip_container svg {
+    @apply h-[22px] w-[22px] p-1;
   }
 
   .profile {
@@ -82,7 +86,15 @@
   }
 
   .top_options_container {
-    @apply flex justify-between;
+    @apply flex justify-between mb-[61px];
+  }
+
+  .task_options {
+    @apply grid grid-cols-2;
+  }
+
+  .dialog_task_name {
+    @apply relative border-b border-[rgba(0,0,0,0.3)] pr-[21px] pb-1;
   }
 }
 

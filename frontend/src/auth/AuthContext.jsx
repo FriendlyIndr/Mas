@@ -42,9 +42,7 @@ export function AuthProvider({ children }) {
     useEffect(() => {
         async function bootstrapAuth() {
             try {
-                const res = await fetch('http://localhost:3000/auth/me', {
-                    credentials: 'include',
-                });
+                const res = await apiFetch('http://localhost:3000/auth/me');
 
                 if (res.ok) {
                     setIsAuthenticated(true);

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { ChevronLeft, ChevronRight, DoorOpen, EllipsisVertical, Trash, User } from 'lucide-react';
+import { ChevronLeft, ChevronRight, DoorOpen, EllipsisVertical, User } from 'lucide-react';
 import Day from './reusables/Day';
 import { DndContext, closestCenter, DragOverlay, useSensors, useSensor, PointerSensor } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import apiFetch from '../utils/apiFetch';
 import { useAuth } from '../auth/AuthContext';
 import { useAuthGuard } from '../auth/useAuthGuard';
+import TaskMenu from './reusables/TaskMenu';
 
 const Calendar = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -313,29 +314,6 @@ const Calendar = () => {
     };
   }, [dialogVisible]);
 
-  async function deleteTask(task) {
-    try {
-      const response = await fetch(`http://localhost:3000/tasks/${task.id}`, {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      setDialogVisible(false);
-      setTasks(prev => (
-        prev.filter(function(t) {
-          return t.id !== task.id;
-        })
-      ));
-    } catch (err) {
-      console.error('Error deleting task:', err);
-    }
-  }
-
   if (isLoading) {
     return (
       <p>Loading...</p>
@@ -487,30 +465,12 @@ const Calendar = () => {
           className='dialog_overlay' 
           style={{ inset: 0 }}
         >
-          <div 
-            className='task_menu dialog withPaddings sizeMedium'
-            ref={dialogRef}
-          >
-            <div className='top_options_container'>
-              <div className='date_picker'>
-
-              </div>
-              
-              <div 
-                className='tooltip_container'
-                onClick={() => deleteTask(clickedTask)}
-              >
-                <span className='tooltip_title'>Delete</span>
-                <Trash />
-              </div>
-            </div>
-
-            <div className='dialog_task_name'>
-              <textarea 
-                value={clickedTask.name}
-              ></textarea>
-            </div>
-          </div>
+          <TaskMenu 
+            dialogRef={dialogRef}
+            clickedTask={clickedTask}
+            setDialogVisible={setDialogVisible}
+            setTasks={setTasks}
+          />
         </div>
       )}
     </>

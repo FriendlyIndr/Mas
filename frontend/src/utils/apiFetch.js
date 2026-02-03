@@ -11,26 +11,24 @@ export default async function apiFetch(url, options ={}) {
         credentials: 'include',
     });
 
-    if (response.status != 401) {
+    if (response.status !== 401) {
         return response;
     }
 
     // Try refresh
-    const refreshResponse = await fetch('http://localhost:3000/auth/refresh', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' }
-    });
+    const refreshResponse = await fetch(
+        'http://localhost:3000/auth/refresh',
+        {
+            method: 'POST',
+            credentials: 'include',
+        }
+    );
 
     if (!refreshResponse.ok) {
+        // Refresh failed -> session dead
         throw new SessionExpireError();
     }
 
-    // Retry original request once
-    const retryResponse = await fetch(url, {
-        ...options,
-        credentials: 'include',
-    });
-
-    return retryResponse;
+    // Retry original request
+    return apiFetch(url, options);
 }
