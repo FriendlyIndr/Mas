@@ -4,8 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { loginSchema } from '../../../shared/schemas/login.schema';
 import FormField from './reusables/FormField';
-import { tr } from 'zod/v4/locales';
-import { useAuth } from '../auth/AuthContext';
 
 const Login = ({ setShowLoginForm }) => {
   const [email, setEmail] = useState('');
@@ -15,7 +13,6 @@ const Login = ({ setShowLoginForm }) => {
   const [error, setError] = useState('');
 
   const navigate = useNavigate();
-  const { login } = useAuth();
 
   // Common onChange for input fields
   function inputChange (setField, e) {
@@ -82,7 +79,6 @@ const Login = ({ setShowLoginForm }) => {
       if (response.status === 200) {
         const message = responseData.message;
         setMessage(message);
-        login();
         navigate('/home');
       }
     } catch (error) {

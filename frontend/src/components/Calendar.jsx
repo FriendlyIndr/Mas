@@ -5,8 +5,6 @@ import { DndContext, closestCenter, DragOverlay, useSensors, useSensor, PointerS
 import { arrayMove } from '@dnd-kit/sortable';
 import { useNavigate } from 'react-router-dom';
 import apiFetch from '../utils/apiFetch';
-import { useAuth } from '../auth/AuthContext';
-import { useAuthGuard } from '../auth/useAuthGuard';
 import TaskMenu from './reusables/TaskMenu';
 
 const Calendar = () => {
@@ -31,9 +29,6 @@ const Calendar = () => {
   const [clickedTask, setclickedTask] = useState('');
 
   const navigate = useNavigate();
-  const { logout } = useAuth();
-
-  const guard = useAuthGuard();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -219,7 +214,7 @@ const Calendar = () => {
       return;
     }
 
-    guard(fetchTasks);
+    fetchTasks();
   }, [days]);
 
   function moveWeek(dir) {
@@ -252,7 +247,7 @@ const Calendar = () => {
   }
 
   useEffect(() => {
-    guard(fetchUser);
+    fetchUser();
   }, []);
 
   const profileRef = useRef(null);
@@ -289,6 +284,26 @@ const Calendar = () => {
       document.removeEventListener('mousedown', handleClickOutsideProfileMenu);
     };
   }, [profileMenu.visible])
+
+  async function handleLogOut() {
+    try {
+      const response = await fetch('http://localhost:3000/auth/logout', {
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: {}
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+    } catch (err) {
+      console.error('Error logging out:', err);
+    } finally {
+      setUserDetails(prev => ({
+        userName: ''
+      }));
+    }
+  }
 
   function handleTaskClick(task) {
     setclickedTask(task);
@@ -450,7 +465,7 @@ const Calendar = () => {
             <div className='profile_menu_footer'>
               <span 
                 className='profile_menu_footer_link'
-                onClick={logout}
+                onClick={() => handleLogOut()}
               >
                 <DoorOpen size={15} className='mr-1.5'/>
                 Log out

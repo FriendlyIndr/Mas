@@ -96,6 +96,18 @@
   .dialog_task_name {
     @apply relative border-b border-[rgba(0,0,0,0.3)] pr-[21px] pb-1;
   }
+
+  textarea {
+    @apply w-full border-none;
+  }
+
+  .repeat_task_menu_container {
+    @apply absolute transform translate-x-[-30.8px] translate-y-14;
+  }
+
+  .repeat_task_menu {
+    @apply p-3 border rounded-xl;
+  }
 }
 
 :root {

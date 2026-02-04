@@ -5,19 +5,16 @@ import { use, useState } from "react";
 import { useEffect } from "react";
 import { useContext } from "react";
 import { createContext } from "react";
-import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [isAuthResolved, setIsAuthResolved] = useState(false);
-
-    const navigate = useNavigate();
+    const [isAuthenticated, setIsAuthenticated] = useState(true);
+    const [isAuthResolved, setIsAuthResolved] = useState(true);
     
     const logout = async () => {
         try {
-            await fetch('http://localhost:3000/auth/logout', {
+            await apiFetch('http://localhost:3000/auth/logout', {
                 method: 'POST',
                 credentials: 'include',
             });
@@ -26,7 +23,6 @@ export function AuthProvider({ children }) {
         } finally {
             setIsAuthenticated(false);
             setIsAuthResolved(true);
-            navigate('/auth');
         }
     }
 

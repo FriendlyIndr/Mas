@@ -1,6 +1,6 @@
 // Bridge between API and UI
 
-import { SessionExpireError } from "../utils/errors";
+import { RefreshTokenExpiredError } from "../utils/errors";
 import { useAuth } from "./AuthContext";
 
 export function useAuthGuard() {
@@ -10,7 +10,7 @@ export function useAuthGuard() {
         try {
             await fn();
         } catch (err) {
-            if (err instanceof SessionExpireError) {
+            if (err instanceof RefreshTokenExpiredError) {
                 logout();
             } else {
                 throw err;

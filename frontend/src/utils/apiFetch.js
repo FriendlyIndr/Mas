@@ -1,9 +1,9 @@
-import { SessionExpireError } from "./errors";
+import { RefreshTokenExpiredError } from "./errors";
 
 export default async function apiFetch(url, options ={}) {
     // Refresh recursion protection
     if (url.includes('/auth/refresh')) {
-        throw new SessionExpireError();
+        throw new Error('Refresh recursion stopped');
     }
 
     const response = await fetch(url, {
@@ -26,7 +26,7 @@ export default async function apiFetch(url, options ={}) {
 
     if (!refreshResponse.ok) {
         // Refresh failed -> session dead
-        throw new SessionExpireError();
+        throw new RefreshTokenExpiredError();
     }
 
     // Retry original request

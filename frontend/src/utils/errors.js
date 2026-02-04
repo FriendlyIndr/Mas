@@ -1,6 +1,13 @@
-export class SessionExpireError extends Error {
+export class AccessTokenExpiredError extends Error {
     constructor() {
-        super('Session expired');
-        this.name = 'SessionExpiredError';
+        super('Access token expired');
+        this.name = 'AccessTokenExpiredError';
+    }
+}
+
+export class RefreshTokenExpiredError extends Error {
+    constructor() {
+        super('Refresh token expired');
+        this.name = 'RefreshTokenExpiredError';
     }
 }
