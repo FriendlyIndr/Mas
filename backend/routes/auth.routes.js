@@ -2,11 +2,11 @@ import { Router } from "express";
 import User from '../models/User.js';
 import RefreshToken from '../models/RefreshToken.js';
 import bcrypt from 'bcrypt';
-import { signupSchema } from "../../shared/schemas/signup.schema.js";
+import { signupSchema } from "../shared/schemas/signup.schema.js";
 import { z } from 'zod';
 import { signupLimiter } from "../middleware/rateLimit.js";
 import jwt from 'jsonwebtoken';
-import { loginSchema } from "../../shared/schemas/login.schema.js";
+import { loginSchema } from "../shared/schemas/login.schema.js";
 import { requireAuth } from "../middleware/requireAuth.js";
 import * as crypto from 'crypto';
 
