@@ -26,7 +26,7 @@ const Calendar = () => {
   });
 
   const [dialogVisible, setDialogVisible] = useState(false);
-  const [clickedTask, setclickedTask] = useState('');
+  const [clickedTask, setClickedTask] = useState('');
 
   const navigate = useNavigate();
 
@@ -306,7 +306,7 @@ const Calendar = () => {
   }
 
   function handleTaskClick(task) {
-    setclickedTask(task);
+    setClickedTask(task);
     setDialogVisible(true);
   }
 
@@ -483,6 +483,7 @@ const Calendar = () => {
           <TaskMenu 
             dialogRef={dialogRef}
             clickedTask={clickedTask}
+            setClickedTask={setClickedTask}
             setDialogVisible={setDialogVisible}
             setTasks={setTasks}
           />

@@ -1,13 +1,32 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Trash, Repeat, Check, CheckCircle2 } from 'lucide-react'
+import apiFetch from '../../utils/apiFetch';
 
-const TaskMenu = ({ dialogRef, clickedTask, setDialogVisible, setTasks }) => {
+const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, setTasks }) => {
     const [isRepeatMenuOpen, setIsRepeatMenuOpen] = useState(false);
+
+    const repeatMenuRef = useRef(null);
+
+    useEffect(() => {
+        if (!isRepeatMenuOpen) return;
+
+        function handleClickOutsideRepeatMenu(e) {
+            if (repeatMenuRef.current && !repeatMenuRef.current.contains(e.target)) {
+                setIsRepeatMenuOpen(false);
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutsideRepeatMenu);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutsideRepeatMenu);
+        };
+    }, [isRepeatMenuOpen]);
 
     async function checkTask(task) {
         try {
             // Send request to check task endpoint
-            const response = await fetch(`http://localhost:3000/tasks/${task.id}`, {
+            const response = await apiFetch(`http://localhost:3000/tasks/${task.id}`, {
                 method: 'PUT',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
@@ -19,6 +38,11 @@ const TaskMenu = ({ dialogRef, clickedTask, setDialogVisible, setTasks }) => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`)
             }
+
+            setClickedTask(prev => ({
+                ...prev,
+                done: !prev.done,
+            }));
 
             setTasks(prev => 
                 prev.map(t => 
@@ -32,7 +56,7 @@ const TaskMenu = ({ dialogRef, clickedTask, setDialogVisible, setTasks }) => {
 
     async function deleteTask(task) {
         try {
-            const response = await fetch(`http://localhost:3000/tasks/${task.id}`, {
+            const response = await apiFetch(`http://localhost:3000/tasks/${task.id}`, {
                 method: 'DELETE',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' }
@@ -85,7 +109,10 @@ const TaskMenu = ({ dialogRef, clickedTask, setDialogVisible, setTasks }) => {
                     <Repeat />
 
                     {isRepeatMenuOpen && (
-                        <div className='repeat_task_menu_container'>
+                        <div 
+                            className='repeat_task_menu_container'
+                            ref={repeatMenuRef}
+                        >
                             <div className='repeat_task_menu'>
                                 <div className='pb-2 mb-2 border-b'>
                                     <div className='flex items-center gap-2'>
@@ -109,7 +136,7 @@ const TaskMenu = ({ dialogRef, clickedTask, setDialogVisible, setTasks }) => {
             </div>
         </div>
 
-        <div className='dialog_task_name'>
+        <div className={`dialog_task_name ${clickedTask.done ? 'done_dialog_task_name' : ''}`}>
             <div>
                 <textarea 
                     value={clickedTask.name}

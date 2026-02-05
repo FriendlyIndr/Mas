@@ -101,16 +101,20 @@
     @apply relative border-b border-[rgba(0,0,0,0.3)] pr-[21px] pb-1;
   }
 
+  .done_dialog_task_name {
+    @apply opacity-40;
+  }
+
   textarea {
     @apply w-full border-none resize-none font-semibold;
   }
 
   .repeat_task_menu_container {
-    @apply absolute transform translate-x-[-30.8px] translate-y-14;
+    @apply absolute transform translate-x-[-30.8px] translate-y-14 z-50;
   }
 
   .repeat_task_menu {
-    @apply p-3 border rounded-xl;
+    @apply p-3 border rounded-xl bg-[rgb(221,225,251)]/100;
   }
 }
 
