@@ -22,7 +22,7 @@
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.7",
     "shared": "file:../shared",
-    "zod": "^4.3.5"
+    "zod": "^4.3.6"
   },
   "type": "module",
   "devDependencies": {
