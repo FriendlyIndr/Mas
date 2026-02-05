@@ -7,7 +7,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
 const app = express();
-const port = 3000;
+const PORT = 3000;
 
 // Test db connection
 const startServer = async () => {
@@ -15,8 +15,8 @@ const startServer = async () => {
     await db.authenticate();
     console.log('Connection has been established successfully.');
 
-    app.listen(port, () => {
-      console.log(`Backend listening on port ${port}`);
+    app.listen(PORT, () => {
+      console.log(`Backend listening on port ${PORT}`);
     });
   } catch (error) {
     console.error('Unable to connect to the database:', error);
