@@ -1,8 +1,34 @@
 import React, { useState } from 'react'
-import { Trash, Repeat, Check } from 'lucide-react'
+import { Trash, Repeat, Check, CheckCircle2 } from 'lucide-react'
 
 const TaskMenu = ({ dialogRef, clickedTask, setDialogVisible, setTasks }) => {
     const [isRepeatMenuOpen, setIsRepeatMenuOpen] = useState(false);
+
+    async function checkTask(task) {
+        try {
+            // Send request to check task endpoint
+            const response = await fetch(`http://localhost:3000/tasks/${task.id}`, {
+                method: 'PUT',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    done: !task.done,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`)
+            }
+
+            setTasks(prev => 
+                prev.map(t => 
+                    t.id === task.id ? { ...t, done: !t.done } : t
+                )
+            );
+        } catch (err) {
+            console.error('Error checking task:', err);
+        }
+    }
 
     async function deleteTask(task) {
         try {
@@ -87,7 +113,16 @@ const TaskMenu = ({ dialogRef, clickedTask, setDialogVisible, setTasks }) => {
             <div>
                 <textarea 
                     value={clickedTask.name}
+                    className='text-[24px] leading-7'
                 ></textarea>
+            </div>
+
+            {/* Toggle */}
+            <div
+                className={`menu_toggle_container ${clickedTask?.done ? 'text-gray-400' : ''}`}
+                onClick={() => checkTask(clickedTask)}
+            >
+                <CheckCircle2 size={20}/>
             </div>
         </div>
     </div>

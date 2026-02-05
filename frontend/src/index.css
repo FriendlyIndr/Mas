@@ -41,6 +41,10 @@
     @apply absolute right-0 pr-[5px] pl-2 cursor-pointer md:opacity-0 group-hover:opacity-100 transition;
   }
 
+  .menu_toggle_container {
+    @apply absolute top-0 right-0 cursor-pointer;
+  }
+
   .profile_menu {
     @apply fixed z-1000 rounded-sm border w-60 bg-white;
   }
@@ -98,7 +102,7 @@
   }
 
   textarea {
-    @apply w-full border-none;
+    @apply w-full border-none resize-none font-semibold;
   }
 
   .repeat_task_menu_container {
