@@ -1,27 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Trash, Repeat, Check, CheckCircle2 } from 'lucide-react'
 import apiFetch from '../../utils/apiFetch';
+import { useClickOutside } from '../../hooks/useClickOutside';
 
 const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, setTasks }) => {
     const [isRepeatMenuOpen, setIsRepeatMenuOpen] = useState(false);
 
     const repeatMenuRef = useRef(null);
 
-    useEffect(() => {
-        if (!isRepeatMenuOpen) return;
-
-        function handleClickOutsideRepeatMenu(e) {
-            if (repeatMenuRef.current && !repeatMenuRef.current.contains(e.target)) {
-                setIsRepeatMenuOpen(false);
-            }
-        }
-
-        document.addEventListener('mousedown', handleClickOutsideRepeatMenu);
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutsideRepeatMenu);
-        };
-    }, [isRepeatMenuOpen]);
+    useClickOutside(repeatMenuRef, setIsRepeatMenuOpen, isRepeatMenuOpen);
 
     async function checkTask(task) {
         try {

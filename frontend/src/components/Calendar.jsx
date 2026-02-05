@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight, DoorOpen, EllipsisVertical, User } from 'lucide-react';
 import Day from './reusables/Day';
 import { DndContext, closestCenter, DragOverlay, useSensors, useSensor, PointerSensor } from '@dnd-kit/core';
@@ -6,6 +6,7 @@ import { arrayMove } from '@dnd-kit/sortable';
 import { useNavigate } from 'react-router-dom';
 import apiFetch from '../utils/apiFetch';
 import TaskMenu from './reusables/TaskMenu';
+import { useClickOutside } from '../hooks/useClickOutside';
 
 const Calendar = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -269,21 +270,11 @@ const Calendar = () => {
     }
   }
 
-  useEffect(() => {
-    if (!profileMenu.visible) return;
+  const closeProfileMenu = useCallback(() => {
+    setProfileMenu(prev => ({ ...prev, visible: false }));
+  }, []);
 
-    function handleClickOutsideProfileMenu(e) {
-      if (profileMenuRef.current && !profileMenuRef.current.contains(e.target)) {
-        setProfileMenu(prev => ({ ...prev, visible: false }));
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutsideProfileMenu);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutsideProfileMenu);
-    };
-  }, [profileMenu.visible])
+  useClickOutside(profileMenuRef, closeProfileMenu, profileMenu.visible);
 
   async function handleLogOut() {
     try {
@@ -312,22 +303,7 @@ const Calendar = () => {
 
   const dialogRef = useRef(null);
 
-  useEffect(() => {
-    if (!dialogVisible) return;
-
-    function handleClickOutsideDialog(e) {
-      if (dialogRef.current && !dialogRef.current.contains(e.target)) {
-        setDialogVisible(false);
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutsideDialog);
-
-    return () => {
-      // Cleanup the document on component unmount
-      document.removeEventListener('mousedown', handleClickOutsideDialog);
-    };
-  }, [dialogVisible]);
+  useClickOutside(dialogRef, setDialogVisible, dialogVisible);
 
   if (isLoading) {
     return (
