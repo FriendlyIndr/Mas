@@ -15,4 +15,6 @@ export default db.define('User', {
         type: DataTypes.STRING,
         allowNull: true,
     },
+}, {
+    tableName: 'Users',
 });
