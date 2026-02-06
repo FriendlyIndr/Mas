@@ -2,7 +2,7 @@ import React from 'react'
 import FormField from './reusables/FormField';
 import PasswordField from './reusables/PasswordField';
 import { useState } from 'react';
-import { signupSchema } from '../../../shared/schemas/signup.schema';
+import { signupSchema } from '../../shared/schemas/signup.schema';
 import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
 

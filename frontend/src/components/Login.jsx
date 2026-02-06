@@ -2,7 +2,7 @@ import { useState } from 'react';
 import PasswordField from './reusables/PasswordField';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import { loginSchema } from '../../../shared/schemas/login.schema';
+import { loginSchema } from '../../shared/schemas/login.schema';
 import FormField from './reusables/FormField';
 
 const Login = ({ setShowLoginForm }) => {
