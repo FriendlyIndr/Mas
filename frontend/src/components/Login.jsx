@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { loginSchema } from '../../shared/schemas/login.schema';
 import FormField from './reusables/FormField';
+import { API_BASE } from '../utils/api';
 
 const Login = ({ setShowLoginForm }) => {
   const [email, setEmail] = useState('');
@@ -53,7 +54,7 @@ const Login = ({ setShowLoginForm }) => {
         return;
       }
 
-      const response = await fetch('http://localhost:3000/auth/login', {
+      const response = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type' : 'application/json' },

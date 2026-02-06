@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Trash, Repeat, Check, CheckCircle2 } from 'lucide-react'
 import apiFetch from '../../utils/apiFetch';
 import { useClickOutside } from '../../hooks/useClickOutside';
+import { API_BASE } from '../../utils/api';
 
 const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, setTasks }) => {
     const [isRepeatMenuOpen, setIsRepeatMenuOpen] = useState(false);
@@ -13,7 +14,7 @@ const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, se
     async function checkTask(task) {
         try {
             // Send request to check task endpoint
-            const response = await apiFetch(`http://localhost:3000/tasks/${task.id}`, {
+            const response = await apiFetch(`${API_BASE}/tasks/${task.id}`, {
                 method: 'PUT',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
@@ -43,7 +44,7 @@ const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, se
 
     async function deleteTask(task) {
         try {
-            const response = await apiFetch(`http://localhost:3000/tasks/${task.id}`, {
+            const response = await apiFetch(`${API_BASE}/tasks/${task.id}`, {
                 method: 'DELETE',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' }

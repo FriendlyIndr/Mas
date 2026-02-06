@@ -21,7 +21,7 @@ export default async function apiFetch(url, options ={}) {
     if (!refreshPromise) {
         // Try refresh
         refreshPromise = fetch(
-            'http://localhost:3000/auth/refresh',
+            `${API_BASE}/auth/refresh`,
             {
                 method: 'POST',
                 credentials: 'include',

@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import apiFetch from '../utils/apiFetch';
 import TaskMenu from './reusables/TaskMenu';
 import { useClickOutside } from '../hooks/useClickOutside';
+import { API_BASE } from '../utils/api';
 
 const Calendar = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -103,7 +104,7 @@ const Calendar = () => {
 
   async function syncTasksToBackend(changedTasks) {
     try {
-      const response = await fetch('http://localhost:3000/tasks/move', {
+      const response = await fetch(`${API_BASE}/tasks/move`, {
         method: 'PATCH',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -190,7 +191,7 @@ const Calendar = () => {
       const endDate = dates[dates.length - 1];
 
       // Fetch tasks
-      const response = await apiFetch(`http://localhost:3000/tasks?startDate=${days[startDate]}&endDate=${days[endDate]}`, {
+      const response = await apiFetch(`${API_BASE}/tasks?startDate=${days[startDate]}&endDate=${days[endDate]}`, {
         headers: {
           'Content-Type': 'application/json'
         },
@@ -228,7 +229,7 @@ const Calendar = () => {
 
   async function fetchUser() {
     try {
-      const response = await apiFetch('http://localhost:3000/auth/me', {
+      const response = await apiFetch(`${API_BASE}/auth/me`, {
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' }
       });
@@ -278,7 +279,7 @@ const Calendar = () => {
 
   async function handleLogOut() {
     try {
-      const response = await fetch('http://localhost:3000/auth/logout', {
+      const response = await fetch(`${API_BASE}/auth/logout`, {
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: {}

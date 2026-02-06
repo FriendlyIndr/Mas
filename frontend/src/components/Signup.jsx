@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { signupSchema } from '../../shared/schemas/signup.schema';
 import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE } from '../utils/api';
 
 const Signup = ({ setShowLoginForm }) => {
   const [userName, setUserName] = useState('');
@@ -55,7 +56,7 @@ const Signup = ({ setShowLoginForm }) => {
         return;
       }
 
-      const response = await fetch('http://localhost:3000/auth/signup', {
+      const response = await fetch(`${API_BASE}/auth/signup`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },

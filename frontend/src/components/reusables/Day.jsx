@@ -4,6 +4,7 @@ import Task from './Task'
 import AddTask from './AddTask'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useDroppable } from '@dnd-kit/core';
+import { API_BASE } from '../../utils/api';
 
 const Day = ({ day, date, isToday, tasks, setTasks, handleTaskClick }) => {
     const [taskName, setTaskName] = useState('');
@@ -42,7 +43,7 @@ const Day = ({ day, date, isToday, tasks, setTasks, handleTaskClick }) => {
             };
 
             // Post request to backend
-            const response = await fetch('http://localhost:3000/tasks/add', {
+            const response = await fetch(`${API_BASE}/tasks/add`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -71,7 +72,7 @@ const Day = ({ day, date, isToday, tasks, setTasks, handleTaskClick }) => {
     async function checkTask(task) {
         try {
             // Send request to check task endpoint
-            const response = await fetch(`http://localhost:3000/tasks/${task.id}`, {
+            const response = await fetch(`${API_BASE}/tasks/${task.id}`, {
                 method: 'PUT',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
