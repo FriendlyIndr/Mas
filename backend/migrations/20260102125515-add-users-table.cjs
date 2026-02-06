@@ -14,21 +14,16 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,  
       },
-      email: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        unique: true,
-      },
       passwordHash: {
         type: Sequelize.STRING,
         allowNull: true,
       },
       createdAt: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
         allowNull: false,
       },
       updatedAt: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
         allowNull: false,
       },
     })
