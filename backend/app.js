@@ -7,7 +7,24 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+
+app.use(express.json());
+
+app.use(cookieParser());
+
+// For dev
+app.use(cors({
+  origin: process.env.FRONTEND_URL, // frontend
+  credentials: true
+}));
+
+app.use('/auth' , authRouter);
+app.use('/tasks', tasksRouter);
+
+app.get('/', (req, res) => {
+  res.send('Hello World!');
+})
 
 // Test db connection
 const startServer = async () => {
@@ -25,21 +42,3 @@ const startServer = async () => {
 }
 
 startServer();
-
-app.use(express.json());
-
-app.use(cookieParser());
-
-// For dev
-app.use(cors({
-  origin: 'http://localhost:5173', // frontend
-  credentials: true
-}));
-
-app.use('/auth' , authRouter);
-app.use('/tasks', tasksRouter);
-
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-})
-
