@@ -70,14 +70,14 @@ router.post('/signup', signupLimiter, async (req, res) => {
         res.cookie('auth_token', accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            sameSite: 'none',
             maxAge: 60 * 60 * 1000, // 1 hour
         });
 
         res.cookie('refresh_token', refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            sameSite: 'none',
             path: '/auth/refresh',
         });
 
@@ -148,14 +148,14 @@ router.post('/login', async (req, res) => {
         res.cookie('auth_token', accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            sameSite: 'none',
             maxAge: 60 * 60 * 1000,
         });
 
         res.cookie('refresh_token', refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            sameSite: 'none',
             path: '/auth/refresh',
         });
 
@@ -225,14 +225,14 @@ router.post('/refresh', async (req, res) => {
         res.cookie('auth_token', accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            sameSite: 'none',
             maxAge: 60 * 60 * 1000,
         });
 
         res.cookie('refresh_token', newRefreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            sameSite: 'none',
             path: '/auth/refresh',
         });
 
