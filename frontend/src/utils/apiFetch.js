@@ -1,4 +1,5 @@
 import { RefreshTokenExpiredError } from "./errors";
+import { API_BASE } from "./api";
 
 let refreshPromise = null;
 
@@ -41,5 +42,8 @@ export default async function apiFetch(url, options ={}) {
     await refreshPromise;
 
     // Retry original request
-    return apiFetch(url, options);
+    return fetch(url, {
+        ...options,
+        credentials: 'include',
+    });
 }
