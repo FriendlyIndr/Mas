@@ -1,9 +1,13 @@
 import { useState } from 'react'
 import Calendar from './components/Calendar';
-import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Outlet, Navigate } from 'react-router-dom';
 import Auth from './components/Auth';
 
 const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Navigate to={"/home"} />,
+  },
   {
     path: "/auth",
     element: <Auth />,
