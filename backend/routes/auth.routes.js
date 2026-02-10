@@ -12,6 +12,8 @@ import * as crypto from 'crypto';
 
 const router = Router();
 
+const isProd = process.env.NODE_ENV === 'production';
+
 const REFRESH_TOKEN_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
 
 function hashToken(token) {
@@ -69,15 +71,15 @@ router.post('/signup', signupLimiter, async (req, res) => {
 
         res.cookie('auth_token', accessToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'none',
+            secure: isProd,
+            sameSite: isProd ? 'none' : 'lax',
             maxAge: 60 * 60 * 1000, // 1 hour
         });
 
         res.cookie('refresh_token', refreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'none',
+            secure: isProd,
+            sameSite: isProd ? 'none' : 'lax',
             path: '/auth/refresh',
         });
 
@@ -147,15 +149,15 @@ router.post('/login', async (req, res) => {
 
         res.cookie('auth_token', accessToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'none',
+            secure: isProd,
+            sameSite: isProd ? 'none' : 'lax',
             maxAge: 60 * 60 * 1000,
         });
 
         res.cookie('refresh_token', refreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'none',
+            secure: isProd,
+            sameSite: isProd ? 'none' : 'lax',
             path: '/auth/refresh',
         });
 
@@ -224,15 +226,15 @@ router.post('/refresh', async (req, res) => {
 
         res.cookie('auth_token', accessToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'none',
+            secure: isProd,
+            sameSite: isProd ? 'none' : 'lax',
             maxAge: 60 * 60 * 1000,
         });
 
         res.cookie('refresh_token', newRefreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'none',
+            secure: isProd,
+            sameSite: isProd ? 'none' : 'lax',
             path: '/auth/refresh',
         });
 

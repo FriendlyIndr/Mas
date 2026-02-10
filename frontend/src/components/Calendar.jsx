@@ -316,7 +316,7 @@ const Calendar = () => {
     <>
       <>
         <div className='App'>
-          <div className='flex items-center justify-between px-6 py-4 md:py-0 md:px-0 md:pt-0 md:mb-[72px]'>
+          <div className='flex items-center justify-between px-6 py-4 md:py-0 md:px-0 md:pt-0 md:mb-18'>
             <h1 className='hidden md:inline text-4xl font-bold'>
               {getMonday(activeDay).toLocaleString('en-IN', { month: 'long', year: 'numeric' })}
             </h1>
