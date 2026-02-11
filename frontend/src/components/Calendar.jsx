@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight, DoorOpen, EllipsisVertical, User } from 'lucide-react';
 import Day from './reusables/Day';
-import { DndContext, closestCenter, DragOverlay, useSensors, useSensor, PointerSensor } from '@dnd-kit/core';
+import { DndContext, closestCenter, DragOverlay, useSensors, useSensor, PointerSensor, TouchSensor } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import { useNavigate } from 'react-router-dom';
 import apiFetch from '../utils/apiFetch';
 import TaskMenu from './reusables/TaskMenu';
 import { useClickOutside } from '../hooks/useClickOutside';
+import { useIsTouchDevice } from '../hooks/useIsTouchDevice';
 import { API_BASE } from '../utils/api';
 
 const Calendar = () => {
@@ -30,12 +31,20 @@ const Calendar = () => {
   const [dialogVisible, setDialogVisible] = useState(false);
   const [clickedTask, setClickedTask] = useState('');
 
+  const isTouch = useIsTouchDevice();
+
   const navigate = useNavigate();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 6, // pixels before drag starts
+      }
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 300,
+        tolerance: 8,
       }
     })
   );
@@ -377,6 +386,7 @@ const Calendar = () => {
                   
                   return (
                     <Day 
+                      isTouch={isTouch}
                       day={day}
                       date={date}
                       isToday={isToday}
@@ -396,6 +406,7 @@ const Calendar = () => {
 
                     return (
                       <Day 
+                        isTouch={isTouch}
                         day={day}
                         date={date}
                         isToday={isToday}
@@ -410,7 +421,7 @@ const Calendar = () => {
 
                 <DragOverlay>
                   {activeTask ? (
-                    <div className='px-3 py-2 bg-white shadow rounded border'>
+                    <div className='px-3 py-2 bg-white shadow rounded border truncate'>
                       {activeTask.name}
                     </div>
                   ) : null}
