@@ -116,6 +116,10 @@
   .repeat_task_menu {
     @apply p-3 border rounded-xl bg-[rgb(221,225,251)]/100;
   }
+
+  .weekly_tasks_view {
+    @apply overscroll-contain;
+  }
 }
 
 :root {

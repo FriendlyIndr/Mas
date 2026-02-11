@@ -6,7 +6,7 @@ import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useDroppable } from '@dnd-kit/core';
 import { API_BASE } from '../../utils/api';
 
-const Day = ({ day, date, isToday, tasks, setTasks, handleTaskClick }) => {
+const Day = ({ isTouch, day, date, isToday, tasks, setTasks, handleTaskClick }) => {
     const [taskName, setTaskName] = useState('');
 
     const formattedDate = date.toLocaleString('en-IN', {
@@ -117,6 +117,7 @@ const Day = ({ day, date, isToday, tasks, setTasks, handleTaskClick }) => {
                 {tasksForDay.map((task, i) => {
                     return (
                         <Task 
+                            isTouch={isTouch}
                             task={task}
                             checkTask={checkTask}
                             handleTaskClick={handleTaskClick}
