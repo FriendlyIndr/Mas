@@ -1,6 +1,7 @@
 import { DataTypes } from 'sequelize';
 import db from "../db.js";
 import User from './User.js';
+import TaskSeries from './TaskSeries.js';
 
 const Task = db.define('Task', {
     id: {
@@ -26,6 +27,14 @@ const Task = db.define('Task', {
         type: DataTypes.INTEGER,
         allowNull: true,
     },
+    seriesId: {
+        type: DataTypes.UUID,
+        allowNull: true,
+        references: {
+            model: 'TaskSeries',
+            key: 'id',
+        },
+    },
     userId: {
         type: DataTypes.INTEGER,
         allowNull: true,
@@ -38,13 +47,15 @@ const Task = db.define('Task', {
     },
 }, {
     indexes: [
-        {
-            fields: ['userId', 'date']
-        }
+        { fields: ['userId', 'date'] },
+        { fields: ['userId', 'seriesId'] },
     ]
 });
 
 Task.belongsTo(User, { foreignKey: 'userId' });
 User.hasMany(Task, { foreignKey: 'userId' });
+
+Task.belongsTo(TaskSeries, { foreignKey: 'seriesId' });
+TaskSeries.hasMany(Task, { foreignKey: 'seriesId' });
 
 export default Task;
