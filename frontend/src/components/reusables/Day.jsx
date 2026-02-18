@@ -73,7 +73,7 @@ const Day = ({ isTouch, day, date, isToday, tasks, setTasks, handleTaskClick }) 
         try {
             // Send request to check task endpoint
             const response = await fetch(`${API_BASE}/tasks/${task.id}`, {
-                method: 'PUT',
+                method: 'PATCH',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
