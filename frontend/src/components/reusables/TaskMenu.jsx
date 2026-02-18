@@ -15,8 +15,7 @@ const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, se
         try {
             // Send request to check task endpoint
             const response = await apiFetch(`${API_BASE}/tasks/${task.id}`, {
-                method: 'PUT',
-                credentials: 'include',
+                method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     done: !task.done,
@@ -63,6 +62,41 @@ const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, se
         } catch (err) {
             console.error('Error deleting task:', err);
         }
+    }
+
+    async function handleTaskChange(task, e) {
+        const value = e.target.value;
+
+        setClickedTask(prev => ({
+            ...prev,
+            name: value,
+        }));
+
+        setTasks(prev => 
+            prev.map(t =>
+                t.id === task.id ? { ...t, name: value } : t
+            )
+        );
+
+        // Debounce API call
+        clearTimeout(window.taskEditTimeout);
+        window.taskEditTimeout = setTimeout(async () => {
+            try {
+                const response = await apiFetch(`${API_BASE}/tasks/${task.id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: value,
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+            } catch (err) {
+                console.error('Error editing task name:', err);
+            }
+        }, 500);
     }
 
     async function handleRepeatClick() {
@@ -128,6 +162,7 @@ const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, se
             <div>
                 <textarea 
                     value={clickedTask.name}
+                    onChange={(e) => handleTaskChange(clickedTask, e)}
                     className='text-[24px] leading-7'
                 ></textarea>
             </div>
