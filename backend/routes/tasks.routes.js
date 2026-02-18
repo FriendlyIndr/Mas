@@ -97,15 +97,16 @@ router.patch('/move', requireAuth, async (req, res) => {
     }
 });
 
-router.put('/:taskId', requireAuth, async (req, res) => {
+router.patch('/:taskId', requireAuth, async (req, res) => {
     try {
         const { taskId } = req.params;
+        const { name, done } = req.body;
         console.log('taskId:', taskId);
 
         // Update Task object
         const updatedTask = await Task.update(
-            { done: Sequelize.literal('NOT done') },
-            { where: { id: taskId } }
+            { name, done },
+            { where: { id: taskId, userId: req.user.userId, } }
         );
 
         return res.status(200).json({ updatedTask });
