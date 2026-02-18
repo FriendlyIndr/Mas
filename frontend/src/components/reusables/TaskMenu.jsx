@@ -12,6 +12,17 @@ const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, se
     useClickOutside(repeatMenuRef, setIsRepeatMenuOpen, isRepeatMenuOpen);
 
     async function checkTask(task) {
+        setClickedTask(prev => ({
+            ...prev,
+            done: !prev.done,
+        }));
+
+        setTasks(prev => 
+            prev.map(t => 
+                t.id === task.id ? { ...t, done: !t.done } : t
+            )
+        );
+
         try {
             // Send request to check task endpoint
             const response = await apiFetch(`${API_BASE}/tasks/${task.id}`, {
@@ -25,17 +36,6 @@ const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, se
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`)
             }
-
-            setClickedTask(prev => ({
-                ...prev,
-                done: !prev.done,
-            }));
-
-            setTasks(prev => 
-                prev.map(t => 
-                    t.id === task.id ? { ...t, done: !t.done } : t
-                )
-            );
         } catch (err) {
             console.error('Error checking task:', err);
         }
