@@ -5,6 +5,7 @@ import AddTask from './AddTask'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useDroppable } from '@dnd-kit/core';
 import { API_BASE } from '../../utils/api';
+import apiFetch from '../../utils/apiFetch';
 
 const Day = ({ isTouch, day, date, isToday, tasks, setTasks, handleTaskClick }) => {
     const [taskName, setTaskName] = useState('');
@@ -70,11 +71,16 @@ const Day = ({ isTouch, day, date, isToday, tasks, setTasks, handleTaskClick }) 
     }
 
     async function checkTask(task) {
+        setTasks(prev => 
+            prev.map(t => 
+                t.id === task.id ? { ...t, done: !t.done } : t
+            )
+        );
+
         try {
             // Send request to check task endpoint
-            const response = await fetch(`${API_BASE}/tasks/${task.id}`, {
+            const response = await apiFetch(`${API_BASE}/tasks/${task.id}`, {
                 method: 'PATCH',
-                credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     done: !task.done,
@@ -84,12 +90,6 @@ const Day = ({ isTouch, day, date, isToday, tasks, setTasks, handleTaskClick }) 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`)
             }
-
-            setTasks(prev => 
-                prev.map(t => 
-                    t.id === task.id ? { ...t, done: !t.done } : t
-                )
-            );
         } catch (err) {
             console.error('Error checking task:', err);
         }
