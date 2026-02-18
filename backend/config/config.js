@@ -4,12 +4,15 @@ const username = process.env.DB_USER;
 const password = process.env.DB_PASS;
 const database = process.env.DB_NAME;
 
+const url = process.env.DB_URL;
+
 export default {
   "development": {
     "username": username,
     "password": password,
     "database": database,
     "host": "127.0.0.1",
+    // "url": url,
     "dialect": "postgres"
   },
   "test": {
