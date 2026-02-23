@@ -3,8 +3,10 @@ import { Trash, Repeat, Check, CheckCircle2 } from 'lucide-react'
 import apiFetch from '../../utils/apiFetch';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import { API_BASE } from '../../utils/api';
+import { createRecurrenceRuleString } from '../../utils/createRecurrenceRuleString';
 
 const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, setTasks }) => {
+    const [repeatPeriod, setRepeatPeriod] = useState(clickedTask.rrule ? clickedTask.rrule : null);
     const [isRepeatMenuOpen, setIsRepeatMenuOpen] = useState(false);
 
     const repeatMenuRef = useRef(null);
@@ -99,10 +101,40 @@ const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, se
         }, 500);
     }
 
-    async function handleRepeatClick() {
+    function handleRepeatClick() {
         setIsRepeatMenuOpen(true);
         console.log('repeat period')
     }
+
+    const firstRender = useRef(true);
+
+    useEffect(() => {
+        if (firstRender.current) {
+            firstRender.current = false;
+            return;
+        }
+
+        if (repeatPeriod === undefined) return;
+
+        const timeout = setTimeout(async () => {
+            try {
+                const res = await apiFetch(`${API_BASE}/task-series/add`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        taskId: clickedTask.id,
+                        rrule: createRecurrenceRuleString(repeatPeriod),
+                    }),
+                });
+
+                if (!res.ok) throw new Error(res.status);
+            } catch (err) {
+                console.error('Error changing repeat period:', err);
+            }
+        }, 500);
+
+        return () => clearTimeout(timeout);
+    }, [repeatPeriod]);
 
   return (
     <div 
@@ -137,17 +169,27 @@ const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, se
                         >
                             <div className='repeat_task_menu'>
                                 <div className='pb-2 mb-2 border-b'>
-                                    <div className='flex items-center gap-2'>
-                                        <Check />
+                                    <div 
+                                        onClick={() => setRepeatPeriod(null)}
+                                        className='flex items-center gap-2'
+                                    >
+                                        {repeatPeriod === null && (
+                                            <Check />
+                                        )}
                                         <span>
                                             Never
                                         </span>
                                     </div>
                                 </div>
 
-                                <div className='flex items-center gap-2'>
-                                    <Check />
-                                    <span>
+                                <div 
+                                    onClick={() => setRepeatPeriod('daily')}
+                                    className='flex items-center gap-2'
+                                >
+                                    {repeatPeriod === 'daily' && (
+                                        <Check />
+                                    )}
+                                    <span className='ml-auto'>
                                         Daily
                                     </span>
                                 </div>
