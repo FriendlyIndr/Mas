@@ -3,6 +3,9 @@ import Task from "../models/Task.js";
 import User from "../models/User.js";
 import { requireAuth } from "../middleware/requireAuth.js";
 import { Op, Sequelize, where } from "sequelize";
+import TaskSeries from "../models/TaskSeries.js";
+import pkg from 'rrule';
+const { RRule } = pkg;
 
 const router = Router();
 
@@ -63,8 +66,46 @@ router.get('', requireAuth, async (req, res) => {
             }
         });
 
+        const seriesList = await TaskSeries.findAll({
+            where: {
+                userId: req.user.userId,
+                startDate: { [Op.lte]: end },
+                [Op.or]: [
+                    { endDate: null },
+                    { endDate: { [Op.gte]: start } }
+                ]
+            }
+        });
+
+        let recurringTasks = [];
+
+        for(const series of seriesList) {
+            const rule = RRule.fromString(series.rrule);
+
+            const endDateObj = new Date(end);
+            endDateObj.setUTCHours(23, 59, 59, 999);
+
+            const occurrences = rule.between(
+                new Date(start),
+                endDateObj,
+                true
+            );
+
+            const generatedTasksForSeries = occurrences
+                .filter(date => date.toISOString().slice(0, 10) !== series.startDate) // to not generate duplicate of first task
+                .map((date) => ({
+                    id: `series-${series.id}-${date.toISOString()}`, // fake id
+                    name: series.name,
+                    done: false,
+                    date: date.toISOString().slice(0, 10),
+                    seriesId: series.id,
+                }));
+
+            recurringTasks.push(...generatedTasksForSeries);
+        }
+
         return res.status(200).json({
-            tasks,
+            tasks: [ ...tasks, ...recurringTasks ],
         });
     } catch (err) {
         console.error('Error getting tasks:', err);
