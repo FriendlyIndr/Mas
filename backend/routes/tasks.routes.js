@@ -5,6 +5,7 @@ import { requireAuth } from "../middleware/requireAuth.js";
 import { Op, Sequelize, where } from "sequelize";
 import TaskSeries from "../models/TaskSeries.js";
 import pkg from 'rrule';
+import TaskException from "../models/TaskException.js";
 const { RRule } = pkg;
 
 const router = Router();
@@ -77,10 +78,41 @@ router.get('', requireAuth, async (req, res) => {
             }
         });
 
+        const seriesIds = seriesList.map(s => s.id);
+
+        // Find exceptions to series
+        const exceptions = await TaskException.findAll({
+            where: {
+                userId: req.user.userId,
+                seriesId: { [Op.in]: seriesIds },
+                [Op.or]: [
+                    { date: { [Op.between]: [start, end] } },
+                    { overriddenDate: { [Op.between]: [start, end] } },
+                ]
+            }
+        });
+
+        // Index exceptions (create fast lookup maps)
+        const exceptionMap = new Map(); // for original occurrence
+        const movedToMap = new Map(); // for overridden dates 
+
+        for (const ex of exceptions) {
+            const key = `${ex.seriesId}_${ex.date}`;
+            exceptionMap.set(key, ex);
+
+            if (ex.overriddenDate) {
+                const movedToKey = `${ex.seriesId}_${ex.overriddenDate}`;
+                movedToMap.set(movedToKey, ex);
+            }
+        }
+
         let recurringTasks = [];
 
-        for(const series of seriesList) {
-            const rule = RRule.fromString(series.rrule);
+        for (const series of seriesList) {
+            const rule = new RRule({
+                ...RRule.parseString(series.rrule),
+                dtstart: new Date(series.startDate),
+            });
 
             const endDateObj = new Date(end);
             endDateObj.setUTCHours(23, 59, 59, 999);
@@ -91,17 +123,37 @@ router.get('', requireAuth, async (req, res) => {
                 true
             );
 
-            const generatedTasksForSeries = occurrences
-                .filter(date => date.toISOString().slice(0, 10) !== series.startDate) // to not generate duplicate of first task
-                .map((date) => ({
-                    id: `series-${series.id}-${date.toISOString()}`, // fake id
-                    name: series.name,
-                    done: false,
-                    date: date.toISOString().slice(0, 10),
-                    seriesId: series.id,
-                }));
+            for (const occ of occurrences) {
+                if (occ.toISOString().slice(0, 10) === series.startDate) continue;
 
-            recurringTasks.push(...generatedTasksForSeries);
+                const originalDate = occ.toISOString().slice(0, 10);
+                const key = `${series.id}_${originalDate}`;
+                const exception = exceptionMap.get(key);
+
+                let finalDate = originalDate;
+                let name = series.name;
+                let done = false;
+                let order = null;
+
+                // Moved occurrence
+                if (exception?.overriddenDate) {
+                    finalDate = exception.overriddenDate;
+                }
+
+                if (exception?.done !== undefined) {
+                    done = exception.done;
+                }
+
+                recurringTasks.push({
+                    id: `series-${series.id}-${originalDate}`,
+                    name,
+                    done,
+                    order,
+                    date: finalDate,
+                    seriesId: series.id,
+                    isRecurring: true,
+                });
+            }
         }
 
         return res.status(200).json({

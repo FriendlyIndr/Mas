@@ -3,7 +3,9 @@ import { API_BASE } from "./api";
 
 let refreshPromise = null;
 
-export default async function apiFetch(url, options ={}) {
+export default async function apiFetch(path, options ={}) {
+    const url = `${API_BASE}${path}`;
+
     // Refresh recursion protection
     if (url.includes('/auth/refresh')) {
         throw new Error('Refresh recursion stopped');

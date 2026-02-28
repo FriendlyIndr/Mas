@@ -4,6 +4,7 @@ import express from 'express';
 import authRouter from './routes/auth.routes.js';
 import tasksRouter from './routes/tasks.routes.js';
 import taskSeriesRouter from './routes/task-series.routes.js';
+import taskExceptionsRouter from './routes/task-exception.routes.js';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
@@ -23,6 +24,7 @@ app.use(cors({
 app.use('/auth' , authRouter);
 app.use('/tasks', tasksRouter);
 app.use('/task-series', taskSeriesRouter);
+app.use('/task-exceptions', taskExceptionsRouter);
 
 app.get('/', (req, res) => {
   res.send('Hello World!');

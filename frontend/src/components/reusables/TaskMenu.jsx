@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Trash, Repeat, Check, CheckCircle2 } from 'lucide-react'
 import apiFetch from '../../utils/apiFetch';
 import { useClickOutside } from '../../hooks/useClickOutside';
-import { API_BASE } from '../../utils/api';
 import { createRecurrenceRuleString } from '../../utils/createRecurrenceRuleString';
+import { toggleTaskDone } from '../../utils/tasksApi';
 
 const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, setTasks }) => {
     const [repeatPeriod, setRepeatPeriod] = useState(clickedTask.rrule ? clickedTask.rrule : null);
@@ -26,18 +26,7 @@ const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, se
         );
 
         try {
-            // Send request to check task endpoint
-            const response = await apiFetch(`${API_BASE}/tasks/${task.id}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    done: !task.done,
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`)
-            }
+            await toggleTaskDone(task);
         } catch (err) {
             console.error('Error checking task:', err);
         }
@@ -45,9 +34,8 @@ const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, se
 
     async function deleteTask(task) {
         try {
-            const response = await apiFetch(`${API_BASE}/tasks/${task.id}`, {
+            const response = await apiFetch(`/tasks/${task.id}`, {
                 method: 'DELETE',
-                credentials: 'include',
                 headers: { 'Content-Type': 'application/json' }
             });
 
@@ -84,7 +72,7 @@ const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, se
         clearTimeout(window.taskEditTimeout);
         window.taskEditTimeout = setTimeout(async () => {
             try {
-                const response = await apiFetch(`${API_BASE}/tasks/${task.id}`, {
+                const response = await apiFetch(`/tasks/${task.id}`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -118,7 +106,7 @@ const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, se
 
         const timeout = setTimeout(async () => {
             try {
-                const res = await apiFetch(`${API_BASE}/task-series/add`, {
+                const res = await apiFetch(`/task-series/add`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
