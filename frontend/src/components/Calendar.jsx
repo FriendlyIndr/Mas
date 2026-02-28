@@ -113,9 +113,8 @@ const Calendar = () => {
 
   async function syncTasksToBackend(changedTasks) {
     try {
-      const response = await fetch(`${API_BASE}/tasks/move`, {
+      const response = await apiFetch(`/tasks/move`, {
         method: 'PATCH',
-        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           tasks: changedTasks.map(t => ({
@@ -200,7 +199,7 @@ const Calendar = () => {
       const endDate = dates[dates.length - 1];
 
       // Fetch tasks
-      const response = await apiFetch(`${API_BASE}/tasks?startDate=${days[startDate]}&endDate=${days[endDate]}`, {
+      const response = await apiFetch(`/tasks?startDate=${days[startDate]}&endDate=${days[endDate]}`, {
         headers: {
           'Content-Type': 'application/json'
         },
@@ -238,7 +237,7 @@ const Calendar = () => {
 
   async function fetchUser() {
     try {
-      const response = await apiFetch(`${API_BASE}/auth/me`, {
+      const response = await apiFetch(`/auth/me`, {
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' }
       });
@@ -289,6 +288,7 @@ const Calendar = () => {
   async function handleLogOut() {
     try {
       const response = await fetch(`${API_BASE}/auth/logout`, {
+        method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: {}
