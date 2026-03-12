@@ -117,9 +117,15 @@ router.get('', requireAuth, async (req, res) => {
             const endDateObj = new Date(end);
             endDateObj.setUTCHours(23, 59, 59, 999);
 
+            const seriesEnd = series.endDate
+                ? new Date(series.endDate)
+                : endDateObj;
+
+            const generationEnd = new Date(Math.min(seriesEnd, endDateObj));
+
             const occurrences = rule.between(
                 new Date(start),
-                endDateObj,
+                generationEnd,
                 true
             );
 
