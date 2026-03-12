@@ -318,16 +318,18 @@ const Calendar = () => {
   const todayRef = useRef(null);
 
   useEffect(() => {
-    if (!isTouch) return;
+    if (!isTouch || !todayRef.current) return;
 
-    if (todayRef.current) {
+    const timer = setTimeout(() => {
       todayRef.current.scrollIntoView({
         behavior: "smooth",
         inline: "center",
         block: "nearest"
       });
-    }
-  }, [days]);
+    }, 50);
+
+    return () => clearTimeout(timer);
+  }, [tasks]);
 
   if (isLoading) {
     return (
@@ -373,7 +375,7 @@ const Calendar = () => {
           </div>
 
           <div>
-            <div className='weekly_tasks_view grid grid-cols-1 md:grid-cols-6 px-6 pt-6 md:px-0 md:pt-0'>
+            <div className='weekly_tasks_view md:grid md:grid-cols-6 px-6 pt-6 md:px-0 md:pt-0'>
               <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
