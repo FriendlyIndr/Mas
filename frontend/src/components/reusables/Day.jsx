@@ -101,7 +101,7 @@ const Day = ({ isTouch, day, date, isToday, tasks, setTasks, handleTaskClick }) 
 
             <div className='flex items-center gap-2'>
                 {tasksForDay.length > 0 && (
-                    <span className='text-xs flex items-center px-2 py-0.5 rounded-full bg-gray-200'>
+                    <span className='text-sm flex items-center px-2 py-0.5 rounded-full bg-gray-200'>
                         {completionRate}%
                     </span>
                 )}
