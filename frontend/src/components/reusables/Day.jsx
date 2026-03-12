@@ -30,6 +30,14 @@ const Day = ({ isTouch, day, date, isToday, tasks, setTasks, handleTaskClick }) 
         [tasks, date]
     );
 
+    const completionRate = useMemo(() => {
+        if (tasksForDay.length === 0) return;
+
+        const completed = tasksForDay.filter(t => t.done).length;
+
+        return Math.round((completed / tasksForDay.length) * 100);
+    }, [tasksForDay]);
+
     async function addTask(taskName) {
         if (!taskName) {
             return;
@@ -86,14 +94,22 @@ const Day = ({ isTouch, day, date, isToday, tasks, setTasks, handleTaskClick }) 
   return (
     <div ref={setNodeRef} className='md:px-3'>
         {/* Header */}
-        <div className='flex justify-between pb-3'>
+        <div className='flex justify-between items-center pb-3'>
             <h2 className={`font-bold text-xl ${isToday ? 'text-(--cornflower)' : ''}`}>
                 {formattedDate}
             </h2>
 
-            <h2 className={`font-semibold text-xl ${isToday ? 'text-(--cornflower) opacity-40' : 'opacity-20'}`}>
-                {day}
-            </h2>
+            <div className='flex items-center gap-2'>
+                {tasksForDay.length > 0 && (
+                    <span className='text-xs flex items-center px-2 py-0.5 rounded-full bg-gray-200'>
+                        {completionRate}%
+                    </span>
+                )}
+
+                <h2 className={`font-semibold text-xl ${isToday ? 'text-(--cornflower) opacity-40' : 'opacity-20'}`}>
+                    {day}
+                </h2>
+            </div>
         </div>
 
         {/* Tasks */}
