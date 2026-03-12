@@ -399,7 +399,7 @@ const Calendar = () => {
                   const isToday = new Date(days[day]).toDateString() === new Date().toDateString();
                   
                   return (
-                    <div ref={isToday ? todayRef : null}>
+                    <div ref={isToday ? todayRef : null} key={i}>
                       <Day 
                         isTouch={isTouch}
                         day={day}
@@ -408,7 +408,6 @@ const Calendar = () => {
                         tasks={tasks}
                         setTasks={setTasks}
                         handleTaskClick={handleTaskClick}
-                        key={i}
                       />
                     </div>
                   );
@@ -421,7 +420,7 @@ const Calendar = () => {
                     const isToday = new Date(days[day]).toDateString() === new Date().toDateString();
 
                     return (
-                      <div ref={isToday ? todayRef : null}>
+                      <div ref={isToday ? todayRef : null} key={i}>
                         <Day 
                           isTouch={isTouch}
                           day={day}
@@ -430,7 +429,6 @@ const Calendar = () => {
                           tasks={tasks}
                           setTasks={setTasks}
                           handleTaskClick={handleTaskClick}
-                          key={i}
                         />
                       </div>
                     );
