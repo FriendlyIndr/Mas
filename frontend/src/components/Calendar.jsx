@@ -315,6 +315,20 @@ const Calendar = () => {
 
   useClickOutside(dialogRef, setDialogVisible, dialogVisible);
 
+  const todayRef = useRef(null);
+
+  useEffect(() => {
+    if (!isTouch) return;
+
+    if (todayRef.current) {
+      todayRef.current.scrollIntoView({
+        behavior: "smooth",
+        inline: "center",
+        block: "nearest"
+      });
+    }
+  }, [days]);
+
   if (isLoading) {
     return (
       <p>Loading...</p>
@@ -386,6 +400,7 @@ const Calendar = () => {
                   
                   return (
                     <Day 
+                      ref={isToday ? todayRef : null}
                       isTouch={isTouch}
                       day={day}
                       date={date}
@@ -406,6 +421,7 @@ const Calendar = () => {
 
                     return (
                       <Day 
+                        ref={isToday ? todayRef : null}
                         isTouch={isTouch}
                         day={day}
                         date={date}
