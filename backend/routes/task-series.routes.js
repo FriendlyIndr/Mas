@@ -34,4 +34,34 @@ router.post('/add', requireAuth, async (req, res) => {
     }
 });
 
+router.delete('/:seriesId', requireAuth, async (req, res) => {
+    try {
+        const { seriesId } = req.params;
+        const { endDate } = req.body;
+
+        const series = await TaskSeries.findOne({
+            where: {
+                id: seriesId,
+                userId: req.user.userId,
+            }
+        });
+
+        if (!series) {
+            return res.status(404).json({ message: 'Task series not found' });
+        }
+
+        const end = new Date(endDate);
+        end.setDate(end.getDate() - 1); // move back one day
+
+        await series.update({
+            endDate: end.toISOString().slice(0, 10)
+        });
+
+        return res.status(200).json({ message: 'Task series ended successfully' });
+    } catch (err) {
+        console.error('Error deleting task series:', err);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
 export default router;

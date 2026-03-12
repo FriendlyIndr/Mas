@@ -34,10 +34,23 @@ const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, se
 
     async function deleteTask(task) {
         try {
-            const response = await apiFetch(`/tasks/${task.id}`, {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' }
-            });
+
+            let response;
+
+            if (task.isRecurring) {
+                response = await apiFetch(`/task-series/${task.seriesId}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        endDate: task.date,
+                    })
+                });
+            } else {
+                response = await apiFetch(`/tasks/${task.id}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+            }
 
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
@@ -45,8 +58,11 @@ const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, se
 
             setDialogVisible(false);
             setTasks(prev => (
-                prev.filter(function(t) {
-                return t.id !== task.id;
+                prev.filter(t => {
+                    if (task.isRecurring) {
+                        return t.seriesId !== task.seriesId || t.date < task.date;
+                    }
+                    return t.id !== task.id;
                 })
             ));
         } catch (err) {
