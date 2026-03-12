@@ -399,17 +399,18 @@ const Calendar = () => {
                   const isToday = new Date(days[day]).toDateString() === new Date().toDateString();
                   
                   return (
-                    <Day 
-                      ref={isToday ? todayRef : null}
-                      isTouch={isTouch}
-                      day={day}
-                      date={date}
-                      isToday={isToday}
-                      tasks={tasks}
-                      setTasks={setTasks}
-                      handleTaskClick={handleTaskClick}
-                      key={i}
-                    />
+                    <div ref={isToday ? todayRef : null}>
+                      <Day 
+                        isTouch={isTouch}
+                        day={day}
+                        date={date}
+                        isToday={isToday}
+                        tasks={tasks}
+                        setTasks={setTasks}
+                        handleTaskClick={handleTaskClick}
+                        key={i}
+                      />
+                    </div>
                   );
                 })}
 
@@ -420,17 +421,18 @@ const Calendar = () => {
                     const isToday = new Date(days[day]).toDateString() === new Date().toDateString();
 
                     return (
-                      <Day 
-                        ref={isToday ? todayRef : null}
-                        isTouch={isTouch}
-                        day={day}
-                        date={date}
-                        isToday={isToday}
-                        tasks={tasks}
-                        setTasks={setTasks}
-                        handleTaskClick={handleTaskClick}
-                        key={i}
-                      />
+                      <div ref={isToday ? todayRef : null}>
+                        <Day 
+                          isTouch={isTouch}
+                          day={day}
+                          date={date}
+                          isToday={isToday}
+                          tasks={tasks}
+                          setTasks={setTasks}
+                          handleTaskClick={handleTaskClick}
+                          key={i}
+                        />
+                      </div>
                     );
                   })}
                 </div>
