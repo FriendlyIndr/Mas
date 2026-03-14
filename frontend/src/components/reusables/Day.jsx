@@ -6,6 +6,7 @@ import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useDroppable } from '@dnd-kit/core';
 import apiFetch from '../../utils/apiFetch';
 import { toggleTaskDone } from '../../utils/tasksApi';
+import ProgressCircle from '../ProgressCircle';
 
 const Day = ({ isTouch, day, date, isToday, tasks, setTasks, handleTaskClick }) => {
     const [taskName, setTaskName] = useState('');
@@ -101,9 +102,10 @@ const Day = ({ isTouch, day, date, isToday, tasks, setTasks, handleTaskClick }) 
 
             <div className='flex items-center gap-2'>
                 {tasksForDay.length > 0 && (
-                    <span className='text-sm font-bold flex items-center px-2 py-0.5 rounded-full bg-gray-200'>
-                        {completionRate}%
-                    </span>
+                    // <span className='text-sm font-bold flex items-center px-2 py-0.5 rounded-full bg-gray-200'>
+                    //     {completionRate}%
+                    // </span>
+                    <ProgressCircle percent={completionRate} />
                 )}
 
                 <h2 className={`font-semibold text-xl ${isToday ? 'text-(--cornflower) opacity-40' : 'opacity-20'}`}>
