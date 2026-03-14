@@ -30,6 +30,7 @@ const ProgressCircle = ({ percent = 0, size = 36, stroke = 4 }) => {
             strokeDashoffset={offset}
             strokeLinecap='round'
             transform={`rotate(-90 ${size / 2} ${size / 2})`}
+            style={{ transition: 'stroke-dashoffset 0.35s ease' }}
         />
 
         {/* Text */}
