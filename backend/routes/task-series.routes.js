@@ -64,4 +64,29 @@ router.delete('/:seriesId', requireAuth, async (req, res) => {
     }
 });
 
+router.patch('/:seriesId', requireAuth, async (req, res) => {
+    try {
+        const { seriesId } = req.params;
+        const { name } = req.body;
+
+        const series = await TaskSeries.findOne({
+            where: {
+                id: seriesId,
+                userId: req.user.userId,
+            }
+        });
+        
+        if (!series) {
+            return res.status(404).json({ message: 'Task series not found' });
+        }
+
+        await series.update({ name });
+
+        return res.status(200).json({ message: 'Series updated successfully' });
+    } catch (err) {
+        console.error('Error updating task series:', err);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
 export default router;

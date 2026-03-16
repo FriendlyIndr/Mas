@@ -80,7 +80,13 @@ const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, se
 
         setTasks(prev => 
             prev.map(t =>
-                t.id === task.id ? { ...t, name: value } : t
+                t.isRecurring
+                    ? t.seriesId === task.seriesId
+                        ? { ...t, name: value }
+                        : t
+                    : t.id === task.id 
+                        ? { ...t, name: value } 
+                        : t
             )
         );
 
@@ -88,7 +94,15 @@ const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, se
         clearTimeout(window.taskEditTimeout);
         window.taskEditTimeout = setTimeout(async () => {
             try {
-                const response = await apiFetch(`/tasks/${task.id}`, {
+                let url;
+
+                if (task.isRecurring) {
+                    url = `/task-series/${task.seriesId}`;
+                } else {
+                    url = `/tasks/${task.id}`;
+                }
+
+                const response = await apiFetch(url, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
