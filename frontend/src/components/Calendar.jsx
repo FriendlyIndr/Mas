@@ -9,9 +9,18 @@ import TaskMenu from './reusables/TaskMenu';
 import { useClickOutside } from '../hooks/useClickOutside';
 import { useIsTouchDevice } from '../hooks/useIsTouchDevice';
 import { API_BASE } from '../utils/api';
+import warrior from '../assets/warrior1.png';
+
+const MOTIVATIONAL_LINES = [
+  "Make the habit repeatable",
+  "You're making yourself a better person",
+  "Become your best version",
+  "Your day is becoming better as you're doing your tasks"
+];
 
 const Calendar = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [quoteIndex, setQuoteIndex] = useState(0);
   const [activeDay, setActiveDay] = useState(new Date());
   const [days, setDays] = useState({});
   const [tasks, setTasks] = useState([]);
@@ -48,6 +57,16 @@ const Calendar = () => {
       }
     })
   );
+
+  useEffect(() => {
+    if (!isLoading) return;
+
+    const interval = setInterval(() => {
+      setQuoteIndex(prev => (prev + 1) % MOTIVATIONAL_LINES.length);
+    }, 5000);
+
+    return () => clearInterval(interval); // cleanup
+  }, [isLoading]);
 
   function applyDrag(prev, active, over) {
     const activeTask = prev.find(t => t.id === active.id);
@@ -333,7 +352,24 @@ const Calendar = () => {
 
   if (isLoading) {
     return (
-      <p>Loading...</p>
+      <div className='flex flex-col items-center justify-center h-screen'>
+        {/* Seed animation */}
+        {/* <div className='flex space-x-2'>
+          <div className='w-4 h-4 bg-green-600 rounded-full animate-grow'></div>
+          <div className='w-4 h-4 bg-green-600 rounded-full animate-grow delay-200'></div>
+          <div className='w-4 h-4 bg-green-600 rounded-full animate-grow delay-400'></div>
+        </div> */}
+        {/* Warrior image */}
+        <img 
+          src={warrior}
+          alt='Warrior loading'
+          className='w-full md:w-80 lg:w-[26rem] select-none pointer-events-none'
+        />
+
+        <p className='mt-6 text-xl font-medium text-gray-700 animate-pulse'>
+          {MOTIVATIONAL_LINES[quoteIndex]}
+        </p>
+      </div>
     );
   }
 
