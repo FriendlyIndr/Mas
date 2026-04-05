@@ -24,6 +24,18 @@ const TaskSeries = db.define('TaskSeries', {
         type: DataTypes.DATEONLY,
         allowNull: true,
     },
+
+    parentId: {
+        type: DataTypes.UUID,
+        allowNull: true,
+        references: {
+            model: 'TaskSeries',
+            key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
+    },
+
     userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -38,8 +50,19 @@ const TaskSeries = db.define('TaskSeries', {
     indexes: [
         { fields: ['userId', 'startDate'] },
         { fields: ['userId', 'endDate'] },
+        { fields: ['parentId'] },
     ],
     freezeTableName: true,
+});
+
+TaskSeries.hasMany(TaskSeries, {
+    as: "subtasks",
+    foreignKey: "parentId"
+});
+
+TaskSeries.belongsTo(TaskSeries, {
+    as: "parent",
+    foreignKey: "parentId"
 });
 
 TaskSeries.belongsTo(User, { foreignKey: 'userId' });

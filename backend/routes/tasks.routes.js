@@ -75,7 +75,13 @@ router.get('', requireAuth, async (req, res) => {
                     { endDate: null },
                     { endDate: { [Op.gte]: start } }
                 ]
-            }
+            },
+            include: [
+                {
+                    model: TaskSeries,
+                    as: 'subtasks',
+                }
+            ]
         });
 
         const seriesIds = seriesList.map(s => s.id);
@@ -148,6 +154,24 @@ router.get('', requireAuth, async (req, res) => {
 
                 if (exception?.done !== undefined) {
                     done = exception.done;
+                }
+
+                if (series.subtasks?.length) {
+                    for (const sub of series.subtasks) {
+
+                        // create virtual recurring subtask
+                        recurringTasks.push({
+                            id: `sub-${sub.id}-${originalDate}`,
+                            name: sub.name,
+                            done: false,
+                            order: null,
+                            date: finalDate,
+                            seriesId: sub.id,
+                            parnetId: series.id,
+                            isRecurring: true,
+                            isSubTask: true
+                        });
+                    }
                 }
 
                 recurringTasks.push({
