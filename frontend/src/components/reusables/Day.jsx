@@ -31,6 +31,14 @@ const Day = ({ isTouch, day, date, isToday, tasks, setTasks, handleTaskClick }) 
         [tasks, date]
     );
 
+    const parentTasks = tasksForDay.filter(t => !t.parentId);
+    const subtasks = tasksForDay.filter(t => t.parentId);
+
+    const structured = parentTasks.map(t => ({
+        ...t,
+        subtasks: subtasks.filter(st => st.parentId === t.id)
+    }));
+
     const completionRate = useMemo(() => {
         if (tasksForDay.length === 0) return;
 
@@ -120,15 +128,23 @@ const Day = ({ isTouch, day, date, isToday, tasks, setTasks, handleTaskClick }) 
                 items={tasksForDay.map(t => t.id)}
                 strategy={verticalListSortingStrategy}
             >
-                {tasksForDay.map((task, i) => {
+                {structured.map((task) => {
                     return (
-                        <Task 
-                            isTouch={isTouch}
-                            task={task}
-                            checkTask={checkTask}
-                            handleTaskClick={handleTaskClick}
-                            key={task.id}
-                        />
+                        <div key={task.id}>
+                            <Task 
+                                isTouch={isTouch}
+                                task={task}
+                                checkTask={checkTask}
+                                handleTaskClick={handleTaskClick}
+                                key={task.id}
+                            />
+
+                            {task.subtasks?.map(st => (
+                                <div className='pl-4'>
+                                    <Task key={st.id} task={st} isSubTask />
+                                </div>
+                            ))}
+                        </div>
                     );
                 })}
             </SortableContext>

@@ -8,7 +8,7 @@ const router = Router();
 
 router.post('/add', requireAuth, async (req, res) => {
     try {
-        const { taskId, rrule } = req.body;
+        const { taskId, rrule, parentId } = req.body;
 
         if (!validateRRule(rrule)) {
             return res.status(400).json({ message: 'Invalid recurrence rule' });
@@ -16,13 +16,30 @@ router.post('/add', requireAuth, async (req, res) => {
 
         const task = await Task.findOne({
             where: { id: taskId, userId: req.user.userId }
-        })
+        });
+
+        if (!task) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+
+        // If parentId is provided, validate that parent exists
+        let parent = null;
+        if (parentId) {
+            parent = await TaskSeries.findOne({
+                where: { id: parentId, userId: req.user.userId }
+            });
+
+            if (!parent) {
+                return res.status(400).json({ message: 'Parent series not found' });
+            }
+        }
 
         const series = await TaskSeries.create({
             name: task.name,
             rrule: rrule,
             startDate: task.date,
             userId: req.user.userId,
+            parentId: parentId || null,
         });
 
         await task.update({ seriesId: series.id });
@@ -67,7 +84,7 @@ router.delete('/:seriesId', requireAuth, async (req, res) => {
 router.patch('/:seriesId', requireAuth, async (req, res) => {
     try {
         const { seriesId } = req.params;
-        const { name } = req.body;
+        const { name, parentId } = req.body;
 
         const series = await TaskSeries.findOne({
             where: {
@@ -80,7 +97,25 @@ router.patch('/:seriesId', requireAuth, async (req, res) => {
             return res.status(404).json({ message: 'Task series not found' });
         }
 
-        await series.update({ name });
+        // Validate parentId if supplied
+        if (parentId) {
+            const parent = await TaskSeries.findOne({
+                where: { id: parentId, userId: req.user.userId }
+            });
+
+            if (!parent) {
+                return res.status(400).json({ message: 'Parent series not found' });
+            }
+
+            if (parentId === series.id) {
+                return res.status(400).json({ message: 'Cannot set series as its own parent' });
+            }
+        }
+
+        await series.update({ 
+            ...(name !== undefined && { name }),
+            ...(parentId !== undefined && { parentId }), 
+        });
 
         return res.status(200).json({ message: 'Series updated successfully' });
     } catch (err) {
