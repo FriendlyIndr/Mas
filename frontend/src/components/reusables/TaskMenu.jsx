@@ -1,18 +1,21 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Trash, Repeat, Check, CheckCircle2 } from 'lucide-react'
+import { Trash, Repeat, Check, CheckCircle2, FolderTree } from 'lucide-react'
 import apiFetch from '../../utils/apiFetch';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import { createRecurrenceRuleString } from '../../utils/createRecurrenceRuleString';
 import { toggleTaskDone } from '../../utils/tasksApi';
 import { detectRepeatPeriod } from '../../utils/detectRepeatPeriod';
 
-const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, setTasks }) => {
+const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, setTasks, possibleParents }) => {
     const [repeatPeriod, setRepeatPeriod] = useState(clickedTask.rrule ? detectRepeatPeriod(clickedTask.rrule) : null);
     const [isRepeatMenuOpen, setIsRepeatMenuOpen] = useState(false);
+    const [isParentMenuOpen, setIsParentMenuOpen] = useState(false);
 
     const repeatMenuRef = useRef(null);
+    const parentMenuRef = useRef(null);
 
     useClickOutside(repeatMenuRef, setIsRepeatMenuOpen, isRepeatMenuOpen);
+    useClickOutside(parentMenuRef, setIsParentMenuOpen, isParentMenuOpen);
 
     async function checkTask(task) {
         setClickedTask(prev => ({
@@ -120,6 +123,37 @@ const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, se
         }, 500);
     }
 
+    async function updateParentTask(task, parentId) {
+        setClickedTask(prev => ({
+            ...prev,
+            parentId
+        }));
+
+        // Update UI immediately
+        setTasks(prev =>
+            prev.map(t =>
+                t.id === task.id
+                    ? { ...t, parentId }
+                    : t
+            )
+        );
+
+        // Send to backend
+        try {
+            const url = `task-series/${task.seriesId}`;
+
+            const response = await apiFetch(url, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ parentId })
+            });
+
+            if (!response.ok) throw new Error(response.status);
+        } catch (err) {
+            console.error('Error updating parentId:', err);
+        }
+    }
+
     function handleRepeatClick() {
         setIsRepeatMenuOpen(true);
         console.log('repeat period')
@@ -166,6 +200,51 @@ const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, se
             </div>
             
             <div className='task_options'>
+                {clickedTask.isRecurring && (
+                    <div
+                        className='tooltip_container'
+                        onClick={() => setIsParentMenuOpen(true)}
+                    >
+                        <span className='tooltip_title'>Make Subtask Of</span>
+                        <FolderTree />
+
+                        {isParentMenuOpen && (
+                            <div
+                                className='repeat_task_menu_container'
+                                ref={parentMenuRef}
+                            >
+                                <div className='repeat_task_menu'>
+                                    {possibleParents.length === 0 && (
+                                        <div>
+                                            No parent tasks available
+                                        </div>
+                                    )}
+
+                                    {possibleParents.map(p => (
+                                        <div
+                                            key={p.id}
+                                            className='flex items-center gap-2 pb-2 cursor-pointer'
+                                            onClick={() => updateParentTask(clickedTask, p.id)}
+                                        >
+                                            {clickedTask.parentId === p.id && <Check />}
+                                            <span>{p.name}</span>
+                                        </div>
+                                    ))}
+
+                                    {clickedTask.parentId && (
+                                        <div
+                                            className='border-t'
+                                            onClick={() => updateParentTask(clickedTask, null)}
+                                        >
+                                            <span>Remove Parent</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+
                 <div 
                     className='tooltip_container'
                     onClick={() => deleteTask(clickedTask)}

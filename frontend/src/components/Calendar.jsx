@@ -528,6 +528,13 @@ const Calendar = () => {
             setClickedTask={setClickedTask}
             setDialogVisible={setDialogVisible}
             setTasks={setTasks}
+            possibleParents={tasks.filter(
+              t =>
+                new Date(t.date).toDateString() === new Date(clickedTask.date).toDateString() &&
+                !t.parentId &&
+                t.isRecurring &&
+                t.id !== clickedTask.id
+            )}
           />
         </div>
       )}
