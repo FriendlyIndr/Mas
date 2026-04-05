@@ -140,7 +140,7 @@ const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, se
 
         // Send to backend
         try {
-            const url = `task-series/${task.seriesId}`;
+            const url = `/task-series/${task.seriesId}`;
 
             const response = await apiFetch(url, {
                 method: 'PATCH',
