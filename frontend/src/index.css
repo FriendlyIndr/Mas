@@ -110,11 +110,15 @@
   }
 
   .repeat_task_menu_container {
-    @apply absolute transform translate-x-[-30.8px] translate-y-14 z-50;
+    @apply absolute transform translate-x-[-30.8px] translate-y-14 z-50 w-56;
   }
 
   .repeat_task_menu {
     @apply p-3 border rounded-xl bg-[rgb(221,225,251)]/100;
+  }
+
+  .parent_task_menu {
+    @apply p-3 border rounded-xl bg-[rgb(221,225,251)]/100 max-h-[60vh] overflow-y-auto;
   }
 
   .weekly_tasks_view {

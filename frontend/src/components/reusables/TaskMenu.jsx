@@ -213,7 +213,7 @@ const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, se
                                 className='repeat_task_menu_container'
                                 ref={parentMenuRef}
                             >
-                                <div className='repeat_task_menu'>
+                                <div className='parent_task_menu'>
                                     {possibleParents.length === 0 && (
                                         <div>
                                             No parent tasks available
