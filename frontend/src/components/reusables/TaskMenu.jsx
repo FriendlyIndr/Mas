@@ -4,9 +4,10 @@ import apiFetch from '../../utils/apiFetch';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import { createRecurrenceRuleString } from '../../utils/createRecurrenceRuleString';
 import { toggleTaskDone } from '../../utils/tasksApi';
+import { detectRepeatPeriod } from '../../utils/detectRepeatPeriod';
 
 const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, setTasks }) => {
-    const [repeatPeriod, setRepeatPeriod] = useState(clickedTask.rrule ? clickedTask.rrule : null);
+    const [repeatPeriod, setRepeatPeriod] = useState(clickedTask.rrule ? detectRepeatPeriod(clickedTask.rrule) : null);
     const [isRepeatMenuOpen, setIsRepeatMenuOpen] = useState(false);
 
     const repeatMenuRef = useRef(null);

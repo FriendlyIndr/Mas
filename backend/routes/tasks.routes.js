@@ -181,6 +181,7 @@ router.get('', requireAuth, async (req, res) => {
                     order,
                     date: finalDate,
                     seriesId: series.id,
+                    rrule: series.rrule,
                     isRecurring: true,
                 });
             }
