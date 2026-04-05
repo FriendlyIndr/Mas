@@ -159,6 +159,8 @@ router.get('', requireAuth, async (req, res) => {
                 if (series.subtasks?.length) {
                     for (const sub of series.subtasks) {
 
+                        if (sub.endDate && new Date(sub.endDate) < new Date(finalDate)) continue;
+
                         // create virtual recurring subtask
                         recurringTasks.push({
                             id: `sub-${sub.id}-${originalDate}`,
@@ -167,23 +169,25 @@ router.get('', requireAuth, async (req, res) => {
                             order: null,
                             date: finalDate,
                             seriesId: sub.id,
-                            parentId: series.id,
+                            parentId: sub.parentId,
                             isRecurring: true,
                             isSubTask: true
                         });
                     }
                 }
 
-                recurringTasks.push({
-                    id: series.id,
-                    name,
-                    done,
-                    order,
-                    date: finalDate,
-                    seriesId: series.id,
-                    rrule: series.rrule,
-                    isRecurring: true,
-                });
+                if (!series.parentId) {
+                    recurringTasks.push({
+                        id: `series-${series.id}-${originalDate}`,
+                        name,
+                        done,
+                        order,
+                        date: finalDate,
+                        seriesId: series.id,
+                        rrule: series.rrule,
+                        isRecurring: true,
+                    });
+                }
             }
         }
 
