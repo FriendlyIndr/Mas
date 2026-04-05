@@ -224,9 +224,9 @@ const TaskMenu = ({ dialogRef, clickedTask, setClickedTask, setDialogVisible, se
                                         <div
                                             key={p.id}
                                             className='flex items-center gap-2 pb-2 cursor-pointer'
-                                            onClick={() => updateParentTask(clickedTask, p.id)}
+                                            onClick={() => updateParentTask(clickedTask, p.seriesId)}
                                         >
-                                            {clickedTask.parentId === p.id && <Check />}
+                                            {clickedTask.parentId === p.seriesId && <Check />}
                                             <span>{p.name}</span>
                                         </div>
                                     ))}

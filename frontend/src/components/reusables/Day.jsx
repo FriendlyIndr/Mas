@@ -36,7 +36,11 @@ const Day = ({ isTouch, day, date, isToday, tasks, setTasks, handleTaskClick }) 
 
     const structured = parentTasks.map(t => ({
         ...t,
-        subtasks: subtasks.filter(st => st.parentId === t.id)
+        subtasks: subtasks.filter(st => 
+            st.parentId === t.seriesId &&
+            st.isRecurring === true &&
+            st.isSubTask === true
+        )
     }));
 
     const completionRate = useMemo(() => {
@@ -140,7 +144,7 @@ const Day = ({ isTouch, day, date, isToday, tasks, setTasks, handleTaskClick }) 
                             />
 
                             {task.subtasks?.map(st => (
-                                <div className={isTouch ? 'pl-10' : 'pl-4'}>
+                                <div className={isTouch ? 'pl-12' : 'pl-4'}>
                                     <Task 
                                         key={st.id} 
                                         task={st}
