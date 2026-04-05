@@ -175,7 +175,7 @@ router.get('', requireAuth, async (req, res) => {
                 }
 
                 recurringTasks.push({
-                    id: `series-${series.id}-${originalDate}`,
+                    id: series.id,
                     name,
                     done,
                     order,
