@@ -167,7 +167,7 @@ router.get('', requireAuth, async (req, res) => {
                             order: null,
                             date: finalDate,
                             seriesId: sub.id,
-                            parnetId: series.id,
+                            parentId: series.id,
                             isRecurring: true,
                             isSubTask: true
                         });
