@@ -146,6 +146,7 @@ const Day = ({ isTouch, day, date, isToday, tasks, setTasks, handleTaskClick }) 
                             {task.subtasks?.map(st => (
                                 <div className={isTouch ? 'pl-12' : 'pl-4'}>
                                     <Task 
+                                        isTouch={isTouch}
                                         key={st.id} 
                                         task={st}
                                         checkTask={checkTask} 
