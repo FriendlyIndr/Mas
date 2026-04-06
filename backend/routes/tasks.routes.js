@@ -161,11 +161,19 @@ router.get('', requireAuth, async (req, res) => {
 
                         if (sub.endDate && new Date(sub.endDate) < new Date(finalDate)) continue;
 
+                        const subKey = `${sub.id}_${originalDate}`;
+                        const subException = exceptionMap.get(subKey);
+
+                        let subDone = false;
+                        if (subException?.done !== undefined) {
+                            subDone = subException.done;
+                        }
+
                         // create virtual recurring subtask
                         recurringTasks.push({
                             id: `sub-${sub.id}-${originalDate}`,
                             name: sub.name,
-                            done: false,
+                            done: subDone,
                             order: null,
                             date: finalDate,
                             seriesId: sub.id,
